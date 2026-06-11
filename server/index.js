@@ -18,8 +18,11 @@ if (existsSync(ENV_PATH)) {
 }
 
 // db и роуты импортируем ПОСЛЕ загрузки .env (они читают process.env на старте).
+const { initSchema, isPg } = await import('./datastore.js');
 const { default: stateRoutes } = await import('./routes/state.js');
 const { default: generateRoutes } = await import('./routes/generate.js');
+
+await initSchema(); // создать таблицы (идемпотентно) до приёма запросов
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -38,5 +41,6 @@ if (existsSync(DIST)) {
 
 app.listen(PORT, () => {
   const mode = process.env.BOT_TOKEN ? 'initData-валидация ВКЛ' : 'DEV (без проверки подписи)';
-  console.log(`API на http://localhost:${PORT} · ${mode}`);
+  const store = isPg ? 'Postgres' : 'SQLite';
+  console.log(`API на http://localhost:${PORT} · ${mode} · БД: ${store}`);
 });

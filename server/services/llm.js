@@ -35,24 +35,24 @@ function uid() { return (Date.now().toString(36) + (_n++).toString(36) + Math.fl
 
 /** Превратить вывод генерации (контент) в полноценный City (docs/03-data-model.md).
  *  cache=false (мок) — НЕ писать факты в общий кэш, чтобы не засорять его. */
-function buildCity(input, gen, cache = true) {
+async function buildCity(input, gen, cache = true) {
   const id = 'c' + uid();
   const days = [];
   const places = [];
 
-  (gen.days || []).forEach((d, i) => {
+  for (const d of (gen.days || [])) {
     const dayId = 'd' + uid();
     days.push({ id: dayId, mode: 'walking', first: null, theme: d.theme || '' });
-    (d.places || []).forEach((p, j) => {
-      places.push(normalizePlace(p, dayId, j, input.city, cache));
-    });
-  });
+    let j = 0;
+    for (const p of (d.places || [])) places.push(await normalizePlace(p, dayId, j++, input.city, cache));
+  }
 
   // Идеи (шопинг/еда/на потом) — bucket задаёт сам генератор.
-  (gen.ideas || []).forEach((p, j) => {
+  let k = 0;
+  for (const p of (gen.ideas || [])) {
     const bucket = ['shop', 'food', 'later'].includes(p.bucket) ? p.bucket : 'later';
-    places.push(normalizePlace(p, bucket, j, input.city, cache));
-  });
+    places.push(await normalizePlace(p, bucket, k++, input.city, cache));
+  }
 
   const hotelName = (input.hotel || '').trim();
   return {
@@ -77,7 +77,7 @@ function gmaps(q) {
 }
 
 /** Привести место к схеме Place + закэшировать факты (слой A), если cache=true. */
-function normalizePlace(p, bucket, order, city, cache = true) {
+async function normalizePlace(p, bucket, order, city, cache = true) {
   const name = p.name || 'Место';
   const rname = p.rname || (name + ', ' + city);
   const place = {
@@ -99,7 +99,7 @@ function normalizePlace(p, bucket, order, city, cache = true) {
   };
   // Кэшируем факты о месте (без пользовательских полей).
   if (cache) {
-    setPlace(city, name, {
+    await setPlace(city, name, {
       rating: place.rating, cat: place.cat, rname, wiki: place.wiki,
       desc: place.desc, visit: place.visit, ticket: place.ticket,
       warnH: place.warnH, warnS: place.warnS,
@@ -110,14 +110,14 @@ function normalizePlace(p, bucket, order, city, cache = true) {
 
 /** Главная точка входа: вернуть { city } по входным данным онбординга. */
 export async function generateTrip(input) {
-  if (!API_KEY) return { city: buildCity(input, mockGen(input), false), mock: true };
+  if (!API_KEY) return { city: await buildCity(input, mockGen(input), false), mock: true };
 
-  const known = getPlacesByCity(input.city);
-  let profile = getCityProfile(input.city, PROFILE_TTL);
+  const known = await getPlacesByCity(input.city);
+  const profile = await getCityProfile(input.city, PROFILE_TTL);
   const gen = await callClaude(input, profile, known);
   // Сохраняем профиль города (слой B), если модель его вернула.
-  if (gen.cityProfile) setCityProfile(input.city, gen.cityProfile);
-  return { city: buildCity(input, gen), mock: false };
+  if (gen.cityProfile) await setCityProfile(input.city, gen.cityProfile);
+  return { city: await buildCity(input, gen), mock: false };
 }
 
 /** Вызов Claude Messages API. Возвращает распарсенный объект генерации. */
