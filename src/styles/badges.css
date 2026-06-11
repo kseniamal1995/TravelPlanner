@@ -1,0 +1,12 @@
+/* ── Бейдж-категория места ── (список категорий — в src/data/badges.js).
+   Категория — мета-информация: без подложки, серый текст с иконкой.
+   Цветная заливка зарезервирована за семантикой (готово / билет / опасность). */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 500; line-height: 1; color: var(--soft);
+  white-space: nowrap;
+}
+.badge .i { vertical-align: 0; }
+
+/* строка под названием: категория · рейтинг · статус-иконки … шеврон */
+.cmeta { display: flex; align-items: center; gap: 7px; row-gap: 4px; margin-top: 6px; flex-wrap: wrap; }

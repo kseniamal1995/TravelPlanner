@@ -1,0 +1,51 @@
+/* ── Табы дней и под-вкладки идей ── (дизайн «пилюль» возвращён в итерации 6) */
+.tabs {
+  display: flex; gap: 7px; overflow-x: auto; padding: 14px 14px 10px; margin: 0 -14px; scrollbar-width: none;
+  /* мягкое растворение краёв при скролле; классы fadeL/fadeR ставит render.js */
+  --fL: 0px; --fR: 0px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--fL), #000 calc(100% - var(--fR)), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 var(--fL), #000 calc(100% - var(--fR)), transparent 100%);
+}
+.tabs.fadeL { --fL: 40px; }
+.tabs.fadeR { --fR: 40px; }
+.tabs::-webkit-scrollbar { display: none; }
+/* Табы тянутся на всю ширину ряда (мало дней — заполняют строку);
+   при 10–14 днях не сжимаются ниже контента — ряд скроллится горизонтально. */
+.tab {
+  position: relative; flex: 1 0 auto; text-align: center;
+  background: var(--pill-bg); border-radius: 15px; padding: 8px 14px 7px; cursor: pointer; min-width: 64px;
+  white-space: nowrap;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+.tab .d { font-weight: 800; font-size: 15px; color: var(--ink); font-family: var(--serif); }
+.tab .s { font-size: 10.5px; color: var(--soft); margin-top: 0; font-weight: 600; }
+.tab.on { background: var(--acc-bg); }
+.tab.on .d { color: var(--acc); }
+.tab.on .s { color: var(--acc); opacity: .7; }
+.tab .idot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; margin: 0; }
+
+/* таб «+ день» — фиксированный, не растягивается */
+.tab.add {
+  display: flex; align-items: center; justify-content: center;
+  flex: 0 0 auto; min-width: 48px; color: var(--soft); padding: 8px 12px;
+}
+
+.subtabs { display: flex; gap: 7px; margin: 12px 2px; }
+.subtab {
+  background: var(--pill-bg); border-radius: 999px; padding: 11px 17px;
+  font-weight: 700; font-size: 13px; color: var(--soft); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.subtab.on { background: var(--acc); color: #fff; }
+
+/* точки нагрузки дня */
+.idot { width: 9px; height: 9px; border-radius: 50%; display: block; margin: 4px auto 0; }
+.idot.lv-easy { background: var(--dot-easy); }
+.idot.lv-med { background: var(--dot-med); }
+.idot.lv-hard { background: var(--dot-hard); }
+/* Чек «посещено» отключён — стиль «пройденного дня» сохранён как наработка:
+.tab .idot.full {
+  width: 13px; height: 13px; top: 4px; right: 4px;
+  background: var(--green); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+} */

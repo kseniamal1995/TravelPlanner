@@ -1,0 +1,191 @@
+/* Генерация маршрута (слой C) через Claude + кэш справочных данных (A/B).
+ *
+ * Без ANTHROPIC_API_KEY работает MOCK — детерминированный каркас поездки, чтобы
+ * можно было собирать и тестировать UI-флоу без ключа и без расходов.
+ *
+ * Реальный путь: Sonnet, системный промпт с правилами «человеческого» маршрута
+ * (docs/01-product.md) помечен cache_control → повторные запросы по тому же
+ * городу дешевле. См. docs/06-telegram-migration.md §2. */
+import { getCityProfile, setCityProfile, getPlacesByCity, setPlace } from '../cache.js';
+
+const API_KEY = process.env.ANTHROPIC_API_KEY || '';
+const MODEL = process.env.LLM_MODEL || 'claude-sonnet-4-6';
+const PROFILE_TTL = 1000 * 60 * 60 * 24 * 30; // профиль города живёт 30 дней
+
+/** Правила «человеческого» маршрута — стабильный префикс (кэшируется). */
+const RULES = `Ты планируешь пешие маршруты путешествий «как составил бы человек».
+Правила:
+- Кластеризация: один день = одна пешеходная зона, минимум переездов.
+- Якорь дня: главное по таймслоту/билету (музей, концерт) — остальное лёгкое вокруг; два тяжёлых музея подряд нельзя.
+- Часы и день недели: учитывай закрытия (музеи пн/вт), воскресенья, последний вход, таймслоты.
+- Кривая усталости: число точек и километров под темп ходьбы (low/med/high).
+- Тайминг впечатлений: рынки утром, закат/подсветка вечером, обед по пути.
+- Маленькие радости: утренний круассан, перерыв в саду.
+- Контекст прилёта/отъезда: день прилёта начинается с логистики, день отъезда лёгкий.
+- Части дня (sect): если день меняет характер (днём гуляем — вечером концерт), размечай разделителем с инструкцией перехода.
+- Дефолты почти без правок.
+
+ЯЗЫК: весь отображаемый текст — на русском (name, desc, theme, visit, sect.t/sect.note, ticket.price/lead, warnH, warnS). Поле rname — официальное название на местном/английском языке для геокодирования (напр. name «Лувр», rname «Louvre Museum, Paris»).
+РЕЙТИНГ: поле rating — по 5-балльной шкале Google, десятичный разделитель ЗАПЯТАЯ (напр. «4,6»). Если не уверен в значении — оставь пустым ''. Никогда не используй 10-балльную шкалу.
+НАЗВАНИЯ: name — короткое имя места (напр. «Лувр», «Сад Тюильри»), без префиксов вроде «Завтрак: …». Тип активности передавай через desc, а не в name.`;
+
+/** Простой uid для серверных id (вне Workflow-песочницы Date/Math доступны). */
+let _n = 0;
+function uid() { return (Date.now().toString(36) + (_n++).toString(36) + Math.floor(Math.random() * 1e6).toString(36)); }
+
+/** Превратить вывод генерации (контент) в полноценный City (docs/03-data-model.md).
+ *  cache=false (мок) — НЕ писать факты в общий кэш, чтобы не засорять его. */
+function buildCity(input, gen, cache = true) {
+  const id = 'c' + uid();
+  const days = [];
+  const places = [];
+
+  (gen.days || []).forEach((d, i) => {
+    const dayId = 'd' + uid();
+    days.push({ id: dayId, mode: 'walking', first: null, theme: d.theme || '' });
+    (d.places || []).forEach((p, j) => {
+      places.push(normalizePlace(p, dayId, j, input.city, cache));
+    });
+  });
+
+  // Идеи (шопинг/еда/на потом) — bucket задаёт сам генератор.
+  (gen.ideas || []).forEach((p, j) => {
+    const bucket = ['shop', 'food', 'later'].includes(p.bucket) ? p.bucket : 'later';
+    places.push(normalizePlace(p, bucket, j, input.city, cache));
+  });
+
+  const hotelName = (input.hotel || '').trim();
+  return {
+    id,
+    name: input.city,
+    tripStart: input.tripStart || '',
+    arrivalDay: days[0] ? days[0].id : null,
+    hotel: hotelName
+      ? { name: hotelName, gmaps: gmaps(hotelName + ' ' + input.city) }
+      : null,
+    reminders: (gen.reminders || []).map((r) => ({
+      id: 'r' + uid(), text: r.text || '', due: r.due || '', url: r.url || undefined, done: false,
+    })),
+    days,
+    activeTab: days[0] ? days[0].id : null,
+    places,
+  };
+}
+
+function gmaps(q) {
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+}
+
+/** Привести место к схеме Place + закэшировать факты (слой A), если cache=true. */
+function normalizePlace(p, bucket, order, city, cache = true) {
+  const name = p.name || 'Место';
+  const rname = p.rname || (name + ', ' + city);
+  const place = {
+    id: 'p' + uid(), bucket,
+    name, rating: p.rating || '',
+    cat: p.cat || 'other',
+    pri: p.pri || undefined,
+    rname,
+    wiki: p.wiki || undefined,
+    desc: p.desc || '',
+    gmaps: gmaps(rname),
+    visit: p.visit || '',
+    leg: p.leg || undefined,
+    ticket: p.ticket || undefined,
+    warnH: p.warnH || undefined,
+    warnS: p.warnS || undefined,
+    sect: p.sect || undefined,
+    bought: false, skipTk: false, userNote: '', done: false, order,
+  };
+  // Кэшируем факты о месте (без пользовательских полей).
+  if (cache) {
+    setPlace(city, name, {
+      rating: place.rating, cat: place.cat, rname, wiki: place.wiki,
+      desc: place.desc, visit: place.visit, ticket: place.ticket,
+      warnH: place.warnH, warnS: place.warnS,
+    });
+  }
+  return place;
+}
+
+/** Главная точка входа: вернуть { city } по входным данным онбординга. */
+export async function generateTrip(input) {
+  if (!API_KEY) return { city: buildCity(input, mockGen(input), false), mock: true };
+
+  const known = getPlacesByCity(input.city);
+  let profile = getCityProfile(input.city, PROFILE_TTL);
+  const gen = await callClaude(input, profile, known);
+  // Сохраняем профиль города (слой B), если модель его вернула.
+  if (gen.cityProfile) setCityProfile(input.city, gen.cityProfile);
+  return { city: buildCity(input, gen), mock: false };
+}
+
+/** Вызов Claude Messages API. Возвращает распарсенный объект генерации. */
+async function callClaude(input, profile, known) {
+  const userPayload = {
+    task: 'Составь маршрут поездки по правилам выше. Верни СТРОГО JSON.',
+    input,
+    cachedCityProfile: profile || null,
+    knownPlaces: known.slice(0, 60),
+    outputSchemaHint: {
+      cityProfile: '{ districts:[], tips:[] } — обнови/создай профиль города',
+      days: '[ { theme, places:[ { name, cat, rating, rname, wiki, desc, visit, leg:{m,t}, ticket:{price,lead,url}, warnH, warnS, pri, sect:{ic,t,note} } ] } ]',
+      ideas: '[ { bucket:"shop"|"food"|"later", name, cat, desc, rname } ]',
+      reminders: '[ { text, due:"YYYY-MM-DD", url } ]',
+    },
+  };
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': API_KEY,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: 8000,
+      system: [
+        { type: 'text', text: RULES, cache_control: { type: 'ephemeral' } },
+        { type: 'text', text: 'Отвечай только валидным JSON-объектом без markdown-обёртки.' },
+      ],
+      messages: [{ role: 'user', content: JSON.stringify(userPayload) }],
+    }),
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error('Anthropic ' + res.status + ': ' + t.slice(0, 300));
+  }
+  const data = await res.json();
+  const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+  return parseJson(text);
+}
+
+/** Достать JSON из ответа (на случай markdown-обёртки). */
+function parseJson(text) {
+  try { return JSON.parse(text); } catch { /* попробуем вырезать */ }
+  const a = text.indexOf('{'), b = text.lastIndexOf('}');
+  if (a >= 0 && b > a) return JSON.parse(text.slice(a, b + 1));
+  throw new Error('LLM вернул не-JSON');
+}
+
+/** MOCK: детерминированный каркас без вызова API (для разработки без ключа). */
+function mockGen(input) {
+  const n = Math.max(1, parseInt(input.days, 10) || 3);
+  const interests = (input.interests || []).join(', ') || 'прогулки';
+  const days = [];
+  for (let i = 0; i < n; i++) {
+    days.push({
+      theme: i === 0 ? 'Прибытие · знакомство' : `День ${i + 1} · ${interests}`,
+      places: [
+        { name: `${input.city}: точка ${i + 1}.1`, cat: 'sight', rating: '4,6', desc: '[MOCK] Подключи ANTHROPIC_API_KEY для реальной генерации.', visit: '~1 ч', leg: { m: 'walk', t: '10 мин' } },
+        { name: `${input.city}: точка ${i + 1}.2`, cat: 'food', rating: '4,4', desc: '[MOCK] Обед по пути.', visit: '~45 мин' },
+      ],
+    });
+  }
+  return {
+    days,
+    ideas: [{ bucket: 'food', name: 'Локальное кафе', cat: 'food', desc: '[MOCK] Идея на потом.' }],
+    reminders: [{ text: 'Проверить часы работы музеев', due: '', url: '' }],
+  };
+}

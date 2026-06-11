@@ -1,0 +1,200 @@
+/* ── Карточки и их содержимое ── */
+
+/* Общая поверхность карточек: без рамок, белое на тонированном фоне + мягкая тень. */
+.tripcard, .flow, .stop, .rcard {
+  background: #fff;
+  border: none;
+  box-shadow: var(--shadow-card);
+}
+
+/* карточка поездки */
+.tripcard {
+  border-radius: 20px; padding: 17px; margin: 12px 0; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+}
+.tripcard h3 { font-size: 20px; }
+.tripcard .meta { color: var(--soft); font-size: 13.5px; font-weight: 600; margin-top: 3px; }
+.tripcard .go { color: var(--soft2); display: flex; align-items: center; }
+
+/* блок прибытия */
+.flow { border-radius: 20px; padding: 14px; margin: 12px 0; }
+.flow .ic { color: var(--acc); font-size: 18px; flex: 0 0 auto; line-height: 1.4; }
+.flow .step { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+.flow .step:last-child { border-bottom: none; }
+.flow .tt { font-weight: 700; font-size: 14px; }
+.flow .ss { color: var(--soft); font-size: 12.5px; font-weight: 600; margin-top: 1px; }
+.flow a { color: var(--blue); font-weight: 800; }
+
+.disc summary {
+  cursor: pointer; font-weight: 800; color: var(--blue); font-size: 13px;
+  list-style: none; margin-top: 3px;
+}
+.disc summary::-webkit-details-marker { display: none; }
+.disc .body { margin-top: 6px; font-size: 13px; color: var(--ink); font-weight: 500; }
+.disc .body b { font-weight: 800; }
+
+.flowwrap { margin: 10px 0; }
+.flowwrap > summary {
+  cursor: pointer; list-style: none; font-weight: 800; font-size: 14px; color: var(--ink);
+  padding: 7px 2px; display: flex; align-items: center; gap: 6px;
+}
+.flowwrap > summary::-webkit-details-marker { display: none; }
+.flowwrap > summary .chev { margin-left: auto; color: var(--soft2); display: inline-flex; transition: transform .25s; }
+.flowwrap[open] > summary .chev { transform: rotate(180deg); }
+
+/* перегоны и «старт» */
+.leg {
+  display: flex; align-items: center; gap: 8px; color: var(--soft);
+  font-size: 12.5px; margin: 1px 2px; font-weight: 700;
+}
+.leg .ln { width: 2px; height: 15px; background: var(--line2); margin-left: 3px; border-radius: 2px; }
+.leg .txt { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 2px 6px; background: var(--pill-bg); padding: 4px 12px; border-radius: 999px; }
+.startleg { margin: 12px 2px 2px; }
+.startleg .txt { color: var(--soft); }
+
+/* строка-подложка (прибытие/заселение) — кликабельна, открывает модалку */
+.inforow {
+  width: 100%; display: flex; align-items: center; gap: 12px; margin: 14px 0;
+  background: #fff; border: none; border-radius: 16px; padding: 11px 14px;
+  box-shadow: var(--shadow-card); cursor: pointer; font-family: inherit; text-align: left;
+}
+/* иконка — того же размера, что превью у карточек мест (.thumb) */
+.inforow-ic {
+  width: 48px; height: 48px; border-radius: 14px; background: var(--gray-bg);
+  display: flex; align-items: center; justify-content: center; flex: 0 0 auto; overflow: hidden;
+}
+.inforow-ic img { width: 74%; height: 74%; object-fit: contain; }
+.inforow-tt { flex: 1; min-width: 0; font-weight: 700; font-size: 15px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.inforow-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--gray-bg); color: var(--soft); font-weight: 700; font-size: 12.5px; padding: 5px 10px; border-radius: 999px; flex: 0 0 auto; }
+.inforow-chev { color: var(--soft2); display: inline-flex; flex: 0 0 auto; }
+
+/* карточка места */
+.stop {
+  border-radius: 20px; padding: 15px 16px; margin: 12px 0; cursor: pointer; transition: box-shadow .25s;
+}
+.stop.open { box-shadow: var(--shadow-card-lg); }
+.stophead { display: flex; align-items: flex-start; gap: 10px; }
+.stophead .nm { flex: 1; min-width: 0; }
+.nmt { font-size: 16.5px; line-height: 1.25; }
+
+/* мета-строка: категория · рейтинг · иконки предупреждения/заметки */
+.cmeta .rt { flex: 0 0 auto; color: var(--soft); font-size: 12.5px; font-weight: 600; margin: 0; white-space: nowrap; }
+.cmeta .mic { display: inline-flex; align-items: center; color: var(--soft2); }
+.cmeta .mic.alert { color: var(--red); }
+
+/* правая колонка карточки: бейдж билета + шеврон, по центру высоты */
+.hright { align-self: center; display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.tkb {
+  width: 28px; height: 28px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center;
+}
+.tkb.need { background: var(--amber-bg); color: var(--amber); }
+.tkb.ok { background: var(--green-bg); color: var(--green); }
+.chev { color: var(--soft2); display: inline-flex; flex: 0 0 auto; transition: transform .25s; }
+.stop.open .chev { transform: rotate(180deg); }
+
+.cbody { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s cubic-bezier(.4,0,.2,1); }
+.stop.open .cbody { grid-template-rows: 1fr; }
+.cbody > .cbin { overflow: hidden; min-height: 0; }
+
+.booked {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--green-bg); color: var(--green); font-size: 12px; font-weight: 700;
+  padding: 5px 11px; border-radius: 999px; margin-top: 10px;
+}
+.vtime { display: flex; align-items: center; gap: 5px; color: var(--soft); font-weight: 600; font-size: 12.5px; margin-top: 10px; }
+.desc { font-size: 14px; margin: 10px 0 0; font-weight: 500; line-height: 1.55; }
+.warn { font-size: 13px; border-radius: 12px; padding: 9px 12px; margin-top: 10px; display: flex; gap: 8px; font-weight: 600; align-items: flex-start; }
+.warn .i { margin-top: 2px; }
+.warn-h { background: var(--amber-bg); color: var(--amber); }
+.warn-s { background: var(--red-bg); color: var(--red); }
+
+.tk { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; font-size: 13px; font-weight: 700; }
+.tk .chip { background: var(--amber-bg); color: var(--amber); padding: 6px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; }
+.tk a { color: var(--blue); display: inline-flex; align-items: center; gap: 4px; }
+.tk .lead { font-weight: 500; color: var(--ink); font-size: 12.5px; width: 100%; margin-top: 2px; }
+.tk .lead b { font-weight: 800; }
+.tk .tkskip { display: inline-flex; align-items: center; gap: 5px; color: var(--soft); font-weight: 600; }
+
+/* текстовая кнопка-ссылка («Не покупать» / «Нужен билет» / «Удалить день») */
+.ghostbtn {
+  background: none; border: none; color: var(--blue); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: inherit; font-weight: 700; font-size: 13px; padding: 4px 6px; min-height: 32px;
+}
+.ghostbtn.danger { color: var(--red); font-weight: 600; font-size: 12.5px; }
+
+.notepill { background: var(--gray-bg); border-radius: 10px; padding: 8px 11px; font-size: 13.5px; margin-top: 10px; font-weight: 600; }
+
+.bottomrow { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.bottomrow a { color: var(--blue); font-weight: 800; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; }
+
+.editbody { display: none; margin-top: 10px; }
+.editbody.on { display: block; }
+.usernote {
+  width: 100%; border: 1.5px solid var(--line2); border-radius: 12px; padding: 9px;
+  font-family: inherit; font-size: 14px; background: #fff; resize: vertical; min-height: 40px; color: var(--ink);
+}
+.editctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.mv {
+  border: 1px solid var(--line2); background: #fff; border-radius: 12px; padding: 7px 28px 7px 10px;
+  min-height: 44px; font-size: 13px; color: var(--ink); font-family: inherit; font-weight: 700;
+  flex: 1; min-width: 120px; -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b909a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 9px center;
+}
+
+/* фото локаций; превью также служит ручкой перетаскивания (ui/drag.js) */
+.thumb {
+  width: 48px; height: 48px; border-radius: 14px; background: var(--gray-bg); color: var(--soft);
+  display: flex; align-items: center; justify-content: center; flex: 0 0 auto; overflow: hidden;
+  touch-action: none; cursor: grab;
+}
+
+/* перетаскивание карточки */
+.stop.dragging { position: relative; z-index: 5; box-shadow: var(--shadow-card-lg); opacity: .96; cursor: grabbing; }
+.dropline { height: 3px; border-radius: 2px; background: var(--acc); margin: 3px 6px; }
+.noselect, .noselect * { user-select: none; -webkit-user-select: none; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; animation: fadein .3s both; -webkit-user-drag: none; }
+.thumb img.emoji { width: 72%; height: 72%; object-fit: contain; }
+.pstack { display: flex; margin-top: 8px; }
+.pthumb {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--acc-bg); color: var(--acc);
+  border: 2px solid #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-right: -9px;
+}
+.pthumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* состояние «посещено»: бледнеет/сереет, без зачёркивания */
+.stop.done .nmt { color: var(--soft2); }
+.stop.done .cmeta { opacity: .5; }
+.stop.done .thumb { filter: grayscale(.85); opacity: .55; }
+
+/* разделители частей дня: нейтральный микро-лейбл между волосяными линиями */
+.daypart { display: flex; align-items: center; gap: 10px; margin: 28px 2px 8px; }
+.daypart .ln { flex: 1; height: 1px; background: var(--line2); }
+.daypart .tt { font-size: 12px; font-weight: 600; color: var(--soft2); letter-spacing: .04em; display: inline-flex; align-items: center; gap: 5px; }
+.dpnote { font-size: 12.5px; color: var(--soft); font-weight: 600; margin: 4px 2px 12px; background: var(--gray-bg); border-radius: 11px; padding: 9px 12px; }
+
+/* напоминания */
+.rcard {
+  border-radius: 18px; padding: 13px 14px; margin: 10px 0;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.rchk { flex: 0 0 auto; padding: 10px; margin: -8px 0 -8px -8px; cursor: pointer; display: flex; }
+.rchk input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--green); }
+.rcard .rt2 { font-weight: 700; font-size: 14px; }
+.rcard .due { font-size: 12px; font-weight: 700; margin-top: 3px; display: inline-block; padding: 2px 8px; border-radius: 8px; }
+.due.soon { background: var(--amber-bg); color: var(--amber); }
+.due.over { background: var(--red-bg); color: var(--red); }
+.due.ok { background: var(--gray-bg); color: var(--soft); }
+.rcard .done { text-decoration: line-through; color: var(--soft); }
+.rmain { flex: 1; min-width: 0; }
+.rmain.tappable { cursor: pointer; }
+.rt2 .chev { vertical-align: -3px; margin-left: 3px; display: inline-flex; }
+.rcard.open .rt2 .chev { transform: rotate(180deg); }
+.rdet { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .25s ease; }
+.rcard.open .rdet { grid-template-rows: 1fr; }
+.rdet .cbin { overflow: hidden; min-height: 0; }
+.rdtext { padding-top: 6px; font-size: 13px; color: var(--soft); font-weight: 600; }
+.rmeta { margin-top: 7px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rcity { color: var(--soft); font-size: 12px; font-weight: 700; }

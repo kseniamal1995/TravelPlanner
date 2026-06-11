@@ -1,0 +1,13 @@
+/* Точка сборки стилей. Порядок важен: токены → база → компоненты → моушн → веса. */
+@import './tokens.css';
+@import './base.css';
+@import './layout.css';
+@import './buttons.css';
+@import './tabs.css';
+@import './cards.css';
+@import './badges.css';
+@import './modal.css';
+@import './toast.css';
+@import './nav.css';
+@import './motion.css';
+@import './weights.css';

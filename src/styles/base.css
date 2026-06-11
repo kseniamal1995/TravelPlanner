@@ -1,0 +1,20 @@
+/* ── Сброс, типографика, базовые элементы ── */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+}
+h1, h2, h3 {
+  margin: 0;
+  line-height: 1.12;
+  font-weight: 800;
+  font-family: var(--serif);
+  letter-spacing: -.01em;
+}
+a { text-decoration: none; }
+.i { flex: 0 0 auto; vertical-align: -3px; }
+.kicker { font-size: 12px; letter-spacing: .04em; color: var(--soft); font-weight: 700; }

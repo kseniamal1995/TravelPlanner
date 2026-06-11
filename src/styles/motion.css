@@ -1,0 +1,37 @@
+/* ── Моушн: все анимации CSS, отключаются prefers-reduced-motion ── */
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+@keyframes sheetup { from { transform: translateY(48px); opacity: .4; } }
+@keyframes ovfade { from { background: rgba(32,30,22,0); } }
+@keyframes pop { 0% { transform: scale(0); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
+@keyframes tabpop { 0% { transform: scale(.92); } 100% { transform: scale(1); } }
+@keyframes flashbg { 0% { background: var(--acc-bg); } 100% { background: #fff; } }
+@keyframes fadein { from { opacity: 0; } }
+
+.anim .stop, .anim .rcard, .anim .tripcard,
+.anim .leg, .anim .daypart, .anim .dpnote {
+  animation: rise .34s cubic-bezier(.2,.7,.2,1) both;
+  animation-delay: var(--d, 0ms);
+}
+.ov.on { animation: ovfade .25s both; }
+.ov.on .modal { animation: sheetup .32s cubic-bezier(.2,.9,.3,1.04) both; }
+.stop.open .cbin { animation: fadein .25s .04s both; }
+.tkbtn.done .i { animation: pop .28s cubic-bezier(.3,1.6,.4,1); }
+.vbtn.on .i { animation: pop .28s cubic-bezier(.3,1.6,.4,1); }
+.anim .tab.on { animation: tabpop .18s ease; }
+.stop.flash { animation: flashbg 1.4s ease; }
+
+/* нажатия */
+.btn:active, .bigbtn:active, .dl-route:active, .iconbtn:active, .tkbtn:active,
+.subtab:active, .sheetbtn:active, .chip:active, .editbtn:active, .ic2:active,
+.stepper button:active, .bnav button:active, .inforow:active { transform: scale(.98); }
+.tab:active { transform: scale(.97); }
+.tripcard:active { transform: scale(.985); }
+
+.btn, .bigbtn, .dl-route, .iconbtn, .tkbtn, .subtab, .sheetbtn, .chip,
+.editbtn, .ic2, .stepper button, .tab, .tripcard, .inforow { transition: transform .13s ease; }
+.stop { transition: box-shadow .25s, transform .13s ease; }
+.stop.dragging { transition: none; animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

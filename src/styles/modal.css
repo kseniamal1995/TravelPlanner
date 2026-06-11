@@ -1,0 +1,49 @@
+/* ── Bottom-sheet (общая модалка) ── */
+.ov {
+  position: fixed; inset: 0; background: rgba(30,32,40,.45);
+  display: none; align-items: flex-end; justify-content: center; z-index: 30;
+}
+.ov.on { display: flex; }
+.modal {
+  background: #fff; width: 100%; max-width: 640px; border-radius: 26px 26px 0 0;
+  padding: 12px 18px calc(28px + env(safe-area-inset-bottom)); max-height: 90vh; overflow: auto;
+}
+.modal::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--line2); margin: 0 auto 14px; }
+.modal h3 { font-size: 20px; margin-bottom: 16px; }
+.modal label { display: block; font-size: 12px; font-weight: 600; color: var(--soft); margin: 12px 0 4px; }
+.modal input, .modal select, .modal textarea {
+  width: 100%; border: 1.5px solid var(--line2); border-radius: 12px; padding: 10px;
+  min-height: 46px; font-family: inherit; font-size: 15px; background: #fff; color: var(--ink);
+}
+.modal textarea { resize: vertical; line-height: 1.5; }
+.modal input:focus, .modal select:focus, .modal textarea:focus, .usernote:focus {
+  outline: none; border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-bg);
+}
+.modal .hint { font-size: 13px; color: var(--soft); font-weight: 500; line-height: 1.5; margin-top: 10px; }
+.modal .two { display: flex; gap: 10px; }
+.modal .two > div { flex: 1; }
+.modal .row { display: flex; gap: 14px; justify-content: flex-end; margin-top: 24px; }
+
+/* списки выбора в шите дня */
+.picklist {
+  display: flex; flex-direction: column; margin-top: 6px; max-height: 240px; overflow: auto;
+  border: 1px solid var(--line); border-radius: 16px; padding: 2px 12px;
+}
+/* .pick — это <label>, поэтому селектор специфичнее `.modal label` (иначе display:block ломает строку) */
+.picklist .pick {
+  display: flex; gap: 11px; align-items: center; margin: 0; padding: 11px 2px;
+  border-bottom: 1px solid var(--line);
+  font-weight: 600; font-size: 14px; color: var(--ink); cursor: pointer;
+}
+.picklist .pick:last-child { border-bottom: none; }
+.picklist .pick input { width: 19px; height: 19px; min-height: 0; padding: 0; border-radius: 5px; accent-color: var(--acc); flex: 0 0 auto; }
+
+/* блоки модалки прибытия: тонированные секции на белом шите */
+.arrblock { background: var(--bg); border: none; border-radius: 14px; padding: 14px 15px; margin-top: 14px; }
+.arrblock:first-child { margin-top: 0; }
+.arrhdr { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--ink); }
+.arrhdr img { width: 22px; height: 22px; object-fit: contain; flex: 0 0 auto; }
+.arrbody { font-size: 13.5px; color: var(--soft); font-weight: 500; line-height: 1.5; margin-top: 10px; }
+.arrbody b { color: var(--ink); font-weight: 700; }
+.arrblock .arrtwo { margin-top: 10px; }
+.arrblock label:first-of-type { margin-top: 12px; }
