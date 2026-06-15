@@ -20,7 +20,5 @@
 /* ── Внутри Telegram (body.tg-app) ── */
 /* Нативная кнопка «назад» Telegram заменяет встроенную «← Поездки». */
 body.tg-app .back { display: none; }
-/* MainButton/BackButton Telegram зеркалят кнопки шита → прячем внутренние, чтобы не дублировались. */
-body.tg-app .modal .row { display: none; }
 /* Верхний safe-area под шапку Telegram. */
 body.tg-app .wrap { padding-top: env(safe-area-inset-top); }

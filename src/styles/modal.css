@@ -11,9 +11,11 @@
 .modal::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--line2); margin: 0 auto 14px; }
 .modal h3 { font-size: 20px; margin-bottom: 14px; }
 /* сегментный прогресс шагов формы (под заголовком) */
-.prog { display: flex; gap: 6px; margin: 0 0 8px; }
+.prog { display: flex; gap: 6px; margin: 4px 0 20px; }
 .prog .seg { flex: 1; height: 4px; border-radius: 2px; background: var(--line2); transition: background .25s; }
 .prog .seg.on { background: var(--acc); }
+/* отступ после прогресс-бара задаётся самим .prog — у первого элемента верхний отступ убираем */
+.prog + label, .prog + .arrblock { margin-top: 0; }
 .modal label { display: block; font-size: 12px; font-weight: 600; color: var(--soft); margin: 12px 0 4px; }
 .modal input, .modal select, .modal textarea {
   width: 100%; border: 1.5px solid var(--line2); border-radius: 12px; padding: 10px;
@@ -23,7 +25,7 @@
 .modal input:focus, .modal select:focus, .modal textarea:focus, .usernote:focus {
   outline: none; border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-bg);
 }
-.modal .hint { font-size: 13px; color: var(--soft); font-weight: 500; line-height: 1.5; margin-top: 10px; }
+.modal .hint { font-size: 13px; color: var(--soft); font-weight: 400; line-height: 1.5; margin-top: 10px; }
 .modal .two { display: flex; gap: 10px; }
 .modal .two > div { flex: 1; }
 .modal .row { display: flex; gap: 14px; justify-content: flex-end; margin-top: 24px; }
@@ -42,8 +44,8 @@
 .picklist .pick:last-child { border-bottom: none; }
 /* у радио/чекбоксов в списках — без квадратной рамки (её даёт базовый .modal input) */
 .picklist .pick input { width: 19px; height: 19px; min-height: 0; padding: 0; border: none; accent-color: var(--acc); flex: 0 0 auto; }
-/* список без разделителей (напр. темп прогулок) */
-.picklist.nodiv .pick { border-bottom: none; }
+/* список без разделителей (напр. темп прогулок) — плотнее */
+.picklist.nodiv .pick { border-bottom: none; padding: 8px 2px; }
 
 /* блоки модалки прибытия: тонированные секции на белом шите */
 .arrblock { background: var(--bg); border: none; border-radius: 14px; padding: 14px 15px; margin-top: 14px; }

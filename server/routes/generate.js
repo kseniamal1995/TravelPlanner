@@ -21,6 +21,7 @@ router.post('/generate', initDataAuth, async (req, res) => {
     arrival: str(b.arrival),
     departure: str(b.departure),
     checkin: str(b.checkin),
+    checkout: str(b.checkout),
     pace: ['low', 'med', 'high'].includes(b.pace) ? b.pace : 'med',
     interests: Array.isArray(b.interests) ? b.interests.map(String) : [],
     mustSee: Array.isArray(b.mustSee) ? b.mustSee.map(String) : [],

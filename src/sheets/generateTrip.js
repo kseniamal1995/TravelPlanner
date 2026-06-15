@@ -17,7 +17,7 @@ const TITLE = 'Новая поездка';
 export function generateTrip() {
   resetOv();
   // Состояние формы переживает перерисовку шагов.
-  const f = { step: 0, city: '', tripStart: '', end: '', hotel: '', arrival: '', departure: '', checkin: '', pace: 'med', interests: [], mustSee: '', fixedEvents: '' };
+  const f = { step: 0, city: '', tripStart: '', end: '', hotel: '', arrival: '', departure: '', checkin: '', checkout: '', pace: 'med', interests: [], mustSee: '', fixedEvents: '' };
   renderStep(f);
   openOv();
 }
@@ -34,6 +34,7 @@ function collect(f) {
     f.arrival = v('g_arr') ?? f.arrival;
     f.departure = v('g_dep') ?? f.departure;
     f.checkin = v('g_ci') ?? f.checkin;
+    f.checkout = v('g_co') ?? f.checkout;
   } else if (f.step === 2) {
     const checked = document.querySelector('#ovBody input[name="g_pace"]:checked');
     if (checked) f.pace = checked.value;
@@ -66,7 +67,8 @@ function renderStep(f) {
       + `<div><label>Вылет</label><input id="g_dep" type="time" value="${esc(f.departure)}"></div></div></div>`
       + `<div class="arrblock"><div class="arrhdr"><img src="/emoji/hotel.png" alt=""> Заселение</div>`
       + `<label>Отель или район</label><input id="g_hotel" placeholder="можно позже" value="${esc(f.hotel)}">`
-      + `<label>Заселение с</label><input id="g_ci" type="time" value="${esc(f.checkin)}"></div>`;
+      + `<div class="two arrtwo"><div><label>Время заезда</label><input id="g_ci" type="time" value="${esc(f.checkin)}"></div>`
+      + `<div><label>Время выезда</label><input id="g_co" type="time" value="${esc(f.checkout)}"></div></div></div>`;
   } else if (f.step === 2) {
     html = `<label>Темп прогулок</label><div class="picklist nodiv">`
       + PACE.map(([val, t]) => `<label class="pick"><input type="radio" name="g_pace" value="${val}" ${f.pace === val ? 'checked' : ''}><span>${t}</span></label>`).join('')
@@ -74,10 +76,10 @@ function renderStep(f) {
   } else if (f.step === 3) {
     html = `<label>Интересы</label><div class="chips">`
       + DAY_THEMES.map(([, t, icon]) => `<button type="button" class="chip${f.interests.includes(t) ? ' on' : ''}" data-v="${esc(t)}">${ic(icon, 15)} ${t}</button>`).join('')
-      + `</div><label>Обязательно увидеть (по строке)</label><textarea id="g_must" rows="3" placeholder="Например:&#10;Эйфелева башня&#10;Лувр">${esc(f.mustSee)}</textarea>`;
+      + `</div><label>Обязательно увидеть</label><textarea id="g_must" rows="3" placeholder="Например:&#10;Эйфелева башня&#10;Лувр">${esc(f.mustSee)}</textarea>`;
   } else if (f.step === 4) {
-    html = `<label>Забронированные мероприятия (необязательно)</label>`
-      + `<textarea id="g_events" rows="4" placeholder="Например:&#10;Концерт — 2026-07-05 18:30&#10;Экскурсия Опера — 2026-07-06 10:00">${esc(f.fixedEvents)}</textarea>`
+    html = `<label>Забронированные мероприятия</label>`
+      + `<textarea id="g_events" rows="4" placeholder="Необязательно">${esc(f.fixedEvents)}</textarea>`
       + `<div class="hint">Напишите мероприятия, на которые у вас уже куплены билеты. Приложение учтёт их при составлении поездки.</div>`;
   }
   body.innerHTML = progBar(f.step, STEPS.length) + html;
@@ -113,7 +115,7 @@ async function submit(f) {
 
   const input = {
     city: f.city, tripStart: f.tripStart, days: daysBetween(f.tripStart, f.end),
-    hotel: f.hotel, arrival: f.arrival, departure: f.departure, checkin: f.checkin,
+    hotel: f.hotel, arrival: f.arrival, departure: f.departure, checkin: f.checkin, checkout: f.checkout,
     pace: f.pace,
     interests: f.interests,
     mustSee: splitLines(f.mustSee),

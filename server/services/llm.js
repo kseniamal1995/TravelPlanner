@@ -9,7 +9,8 @@
 import { getCityProfile, setCityProfile, getPlacesByCity, setPlace } from '../cache.js';
 
 const API_KEY = process.env.ANTHROPIC_API_KEY || '';
-const MODEL = process.env.LLM_MODEL || 'claude-sonnet-4-6';
+// По умолчанию Haiku — быстрее (важно: долгий запрос рвётся в мобильном WebView Telegram).
+const MODEL = process.env.LLM_MODEL || 'claude-haiku-4-5-20251001';
 const PROFILE_TTL = 1000 * 60 * 60 * 24 * 30; // профиль города живёт 30 дней
 
 /** Правила «человеческого» маршрута — стабильный префикс (кэшируется). */
@@ -27,7 +28,8 @@ const RULES = `Ты планируешь пешие маршруты путеш�
 
 ЯЗЫК: весь отображаемый текст — на русском (name, desc, theme, visit, sect.t/sect.note, ticket.price/lead, warnH, warnS). Поле rname — официальное название на местном/английском языке для геокодирования (напр. name «Лувр», rname «Louvre Museum, Paris»).
 РЕЙТИНГ: поле rating — по 5-балльной шкале Google, десятичный разделитель ЗАПЯТАЯ (напр. «4,6»). Если не уверен в значении — оставь пустым ''. Никогда не используй 10-балльную шкалу.
-НАЗВАНИЯ: name — короткое имя места (напр. «Лувр», «Сад Тюильри»), без префиксов вроде «Завтрак: …». Тип активности передавай через desc, а не в name.`;
+НАЗВАНИЯ: name — короткое имя места (напр. «Лувр», «Сад Тюильри»), без префиксов вроде «Завтрак: …». Тип активности передавай через desc, а не в name.
+КРАТКОСТЬ (ВАЖНО для скорости ответа): desc — одно короткое предложение (до ~12 слов). Не больше 6 точек в день. Не повторяй одно и то же в разных полях. Заполняй ticket/warnH/warnS/sect только когда это реально важно, иначе опускай.`;
 
 /** Простой uid для серверных id (вне Workflow-песочницы Date/Math доступны). */
 let _n = 0;
@@ -62,6 +64,7 @@ async function buildCity(input, gen, cache = true) {
     arrival: input.arrival || '',
     departure: input.departure || '',
     checkin: input.checkin || '',
+    checkout: input.checkout || '',
     arrivalDay: days[0] ? days[0].id : null,
     hotel: hotelName
       ? { name: hotelName, gmaps: gmaps(hotelName + ' ' + input.city) }

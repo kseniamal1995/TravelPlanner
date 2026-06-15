@@ -26,38 +26,25 @@ function sheetOpen() {
   return !!(ov && ov.classList.contains('on'));
 }
 
-/** Вызывается в конце render(): управляет BackButton для навигации верхнего уровня. */
+/** Вызывается в конце render(): нативная кнопка «назад» Telegram для навигации
+ *  верхнего уровня (вне home). MainButton не используем — у шитов свои кнопки. */
 export function syncNav() {
-  if (!tg.available || sheetOpen()) return; // при открытом шите хром ведёт onSheetOpen
-  const offHome = !!document.querySelector('.back'); // кнопка .back рендерится только вне home
+  if (!tg.available || sheetOpen()) return;
+  const offHome = !!document.querySelector('.back'); // .back рендерится только вне home
   setMainButton(null);
   setBackButton(offHome ? () => window.goHome && window.goHome() : null);
 }
 
-/** Вызывается при открытии шита: зеркалит #ovSave в MainButton, #ovCancel — в BackButton. */
+/** При открытии шита прячем нативный хром Telegram — используем кнопки шита (Назад/Далее). */
 export function onSheetOpen() {
   if (!tg.available) return;
-  const sv = document.getElementById('ovSave');
-  const cancel = document.getElementById('ovCancel');
-  if (!sv) return;
-
-  const sync = () => {
-    const hidden = sv.style.display === 'none';
-    setMainButton(hidden ? null : (sv.textContent || 'Готово'), () => sv.click());
-    if (!hidden) { tg.mainButtonProgress(!!sv.disabled); tg.mainButtonEnabled(!sv.disabled); }
-  };
-  sync();
-  setBackButton(() => { if (cancel) cancel.click(); });
-
-  ovObserver = new MutationObserver(sync);
-  ovObserver.observe(sv, { attributes: true, attributeFilter: ['style', 'disabled'], childList: true, characterData: true, subtree: true });
+  setMainButton(null);
+  setBackButton(null);
 }
 
-/** Вызывается при закрытии шита: снимает наблюдатель и восстанавливает навигацию. */
+/** При закрытии шита восстанавливаем навигацию верхнего уровня. */
 export function onSheetClose() {
   if (!tg.available) return;
   if (ovObserver) { ovObserver.disconnect(); ovObserver = null; }
-  tg.mainButtonProgress(false);
-  setMainButton(null);
   syncNav();
 }
