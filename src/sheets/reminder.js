@@ -1,11 +1,15 @@
-/* Шит «Новое напоминание»: текст + крайняя дата. */
+/* Шит «Новое напоминание»: текст + крайняя дата. Добавляет в указанную поездку
+   (cid из таба напоминаний) либо в активную. */
 import { uid } from '../lib/format.js';
-import { city, save } from '../store.js';
+import { store, save } from '../store.js';
 import { render } from '../render.js';
 import { resetOv, openOv, closeOv } from '../ui/sheet.js';
 
-export function openRem() {
-  const c = city();
+export function openRem(cid) {
+  const cityId = (cid && store.S.cities[cid]) ? cid
+    : (store.remTab && store.S.cities[store.remTab]) ? store.remTab
+    : store.S.activeCity;
+  const c = store.S.cities[cityId];
   if (!c) return;
   resetOv();
   document.getElementById('ovTitle').textContent = 'Новое напоминание';

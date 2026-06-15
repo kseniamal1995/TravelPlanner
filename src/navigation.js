@@ -22,9 +22,21 @@ export function openTrip2(id) {
   render();
 }
 
+/** Открыть напоминания. scope: 'all' (с главной) | 'trip' (со страницы поездки).
+ *  Одна поездка → её таб (без табов). Несколько → 'all' или таб текущей поездки. */
 export function goRem(scope) {
-  store.remScope = scope;
+  const ids = Object.keys(store.S.cities || {});
+  if (ids.length <= 1) store.remTab = ids[0] || 'all';
+  else store.remTab = (scope === 'trip' && store.S.activeCity) ? store.S.activeCity : 'all';
   store.view = 'reminders';
+  store.animPending = true;
+  render();
+}
+
+/** Переключить таб напоминаний (клик по табу). */
+export function setRemTab(id) {
+  if (store.remTab === id) return;
+  store.remTab = id;
   store.animPending = true;
   render();
 }
@@ -45,7 +57,8 @@ export function setIdeas(id) {
 
 export function goView(v) {
   if (store.view === v) return;
-  if (v === 'reminders') store.remScope = 'trip';
+  // Нижняя навигация доступна внутри поездки → открываем таб текущей поездки.
+  if (v === 'reminders') store.remTab = store.S.activeCity || 'all';
   store.view = v;
   store.animPending = true;
   render();

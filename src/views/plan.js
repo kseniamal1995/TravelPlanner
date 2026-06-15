@@ -6,6 +6,7 @@ import { intensity } from '../lib/intensity.js';
 import { routeUrl } from '../lib/maps.js';
 import { stopHtml } from '../components/stop.js';
 import { arrivalRow, departureRow } from '../components/arrival.js';
+import { cityDot } from '../lib/reminders.js';
 import { emptyHtml } from '../components/empty.js';
 
 export function planHtml() {
@@ -15,7 +16,7 @@ export function planHtml() {
   const n = tabs.length;
   const pc = placeCount(c);
   const sub = pc ? `${pc} ${plural(pc, ['место', 'места', 'мест'])}` : `${n} ${plural(n, ['день', 'дня', 'дней'])}`;
-  t += `<div class="ptitle"><h1>${esc(c.name)}</h1><div class="pbtns"><span class="psub">${sub}</span><button class="iconbtn" onclick="goRem('trip')" title="Напоминания по поездке">${ic('bell', 16)}</button></div></div></div>`;
+  t += `<div class="ptitle"><h1>${esc(c.name)}</h1><div class="pbtns"><span class="psub">${sub}</span><button class="iconbtn${cityDot(c) ? ' hasdot' : ''}" onclick="goRem('trip')" title="Напоминания по поездке" aria-label="Напоминания">${ic('bell', 18)}</button></div></div></div>`;
 
   // табы дней: точка нагрузки + таб «+» для добавления дня
   t += '<div class="tabs">';

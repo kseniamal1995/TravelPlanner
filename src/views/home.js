@@ -2,6 +2,7 @@
 import { ic } from '../icons.js';
 import { esc, dayLabel, plural } from '../lib/format.js';
 import { store, placeCount, imgCache, imgQueue } from '../store.js';
+import { anyDot } from '../lib/reminders.js';
 import { emptyHtml } from '../components/empty.js';
 
 export function homeHtml() {
@@ -21,7 +22,7 @@ export function homeHtml() {
     cards += `<div class="tripcard" style="--d:${Math.min(ci++, 8) * 40}ms" onclick="openTrip2('${id}')"><div><h3>${esc(c.name)}</h3><div class="meta">${range}${range ? ' · ' : ''}${n} ${plural(n, ['день', 'дня', 'дней'])}${pc ? ' · ' + pc + ' ' + plural(pc, ['место', 'места', 'мест']) : ''}</div>${stack}</div><div class="go">${ic('chev', 20)}</div></div>`;
   }
   if (!cards) cards = emptyHtml('route', 'Пока нет поездок', 'Создай первую — соберём маршрут по дням');
-  return `<div class="home"><div class="homehdr"><div><div class="kicker">личный планер</div><h1>Маршруты</h1></div><button class="iconbtn" onclick="goRem('all')">${ic('bell', 16)} Напоминания</button></div>
+  return `<div class="home"><div class="homehdr"><div><div class="kicker">личный планер</div><h1>Маршруты</h1></div><button class="iconbtn${anyDot(S) ? ' hasdot' : ''}" onclick="goRem('all')" title="Напоминания" aria-label="Напоминания">${ic('bell', 18)}</button></div>
     ${cards}
     <button class="bigbtn acc" onclick="generateTrip()">${ic('plus', 16)} Новая поездка</button></div>`;
 }

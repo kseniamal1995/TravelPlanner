@@ -37,6 +37,13 @@
   display: inline-flex; align-items: center; gap: 6px;
 }
 .subtab.on { background: var(--acc); color: #fff; }
+/* таб-ряд напоминаний скроллится, если поездок много */
+.rtabs { overflow-x: auto; flex-wrap: nowrap; -ms-overflow-style: none; scrollbar-width: none; }
+.rtabs::-webkit-scrollbar { display: none; }
+.rtabs .subtab { flex: 0 0 auto; }
+/* точка «есть горящее напоминание» на табе */
+.subtab .rbadge { width: 7px; height: 7px; border-radius: 50%; background: var(--red); display: inline-block; }
+.subtab.on .rbadge { background: #fff; }
 
 /* точки нагрузки дня */
 .idot { width: 9px; height: 9px; border-radius: 50%; display: block; margin: 4px auto 0; }

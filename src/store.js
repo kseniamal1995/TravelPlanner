@@ -11,7 +11,7 @@ export const store = {
   S: null,             // персистентное состояние
   view: 'home',        // 'home' | 'plan' | 'ideas' | 'reminders'
   ideasTab: 'shop',    // активная под-вкладка идей
-  remScope: 'trip',    // 'trip' | 'all' — область напоминаний
+  remTab: 'all',       // активный таб напоминаний: 'all' | cityId
   undoSnap: null,      // снапшот для undo
   animPending: false,  // ставить ли класс .anim при следующем рендере
   flashId: null,       // id только что добавленного места (вспышка)

@@ -9,7 +9,7 @@ import { registerDrag } from './ui/drag.js';
 import { tg } from './services/telegram.js';
 import { closeOv } from './ui/sheet.js';
 import { undoLast } from './ui/toast.js';
-import { goHome, openTrip2, goRem, setTab, setIdeas, goView, addDay, delDay } from './navigation.js';
+import { goHome, openTrip2, goRem, setRemTab, setTab, setIdeas, goView, addDay, delDay } from './navigation.js';
 // Шиты «Настроить день» (sheets/daySheet.js) и «Настройки поездки» (sheets/tripSettings.js)
 // отключены в итерации 6 — файлы сохранены как наработки.
 import { openAdd } from './sheets/addPlace.js';
@@ -22,7 +22,7 @@ import { openDeparture } from './sheets/departure.js';
 // Экспорт обработчиков для inline-onclick в сгенерированной разметке.
 Object.assign(window, {
   closeOv, undoLast,
-  goHome, openTrip2, goRem, setTab, setIdeas, goView, addDay, delDay,
+  goHome, openTrip2, goRem, setRemTab, setTab, setIdeas, goView, addDay, delDay,
   openAdd, openRem, newTrip, generateTrip, openArrival, openDeparture,
 });
 
