@@ -59,6 +59,9 @@ async function buildCity(input, gen, cache = true) {
     id,
     name: input.city,
     tripStart: input.tripStart || '',
+    arrival: input.arrival || '',
+    departure: input.departure || '',
+    checkin: input.checkin || '',
     arrivalDay: days[0] ? days[0].id : null,
     hotel: hotelName
       ? { name: hotelName, gmaps: gmaps(hotelName + ' ' + input.city) }

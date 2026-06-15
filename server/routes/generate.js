@@ -12,11 +12,15 @@ router.post('/generate', initDataAuth, async (req, res) => {
   const city = String(b.city || '').trim();
   if (!city) return res.status(400).json({ error: 'city is required' });
 
+  const str = (x) => (typeof x === 'string' ? x : '');
   const input = {
     city,
-    tripStart: typeof b.tripStart === 'string' ? b.tripStart : '',
+    tripStart: str(b.tripStart),
     days: parseInt(b.days, 10) || 3,
-    hotel: typeof b.hotel === 'string' ? b.hotel : '',
+    hotel: str(b.hotel),
+    arrival: str(b.arrival),
+    departure: str(b.departure),
+    checkin: str(b.checkin),
     pace: ['low', 'med', 'high'].includes(b.pace) ? b.pace : 'med',
     interests: Array.isArray(b.interests) ? b.interests.map(String) : [],
     mustSee: Array.isArray(b.mustSee) ? b.mustSee.map(String) : [],

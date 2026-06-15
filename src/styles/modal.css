@@ -6,7 +6,7 @@
 .ov.on { display: flex; }
 .modal {
   background: #fff; width: 100%; max-width: 640px; border-radius: 26px 26px 0 0;
-  padding: 12px 18px calc(28px + env(safe-area-inset-bottom)); max-height: 90vh; overflow: auto;
+  padding: 24px 18px calc(28px + env(safe-area-inset-bottom)); max-height: 90vh; overflow: auto;
 }
 .modal::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--line2); margin: 0 auto 14px; }
 .modal h3 { font-size: 20px; margin-bottom: 14px; }
@@ -40,7 +40,10 @@
   font-weight: 600; font-size: 14px; color: var(--ink); cursor: pointer;
 }
 .picklist .pick:last-child { border-bottom: none; }
-.picklist .pick input { width: 19px; height: 19px; min-height: 0; padding: 0; border-radius: 5px; accent-color: var(--acc); flex: 0 0 auto; }
+/* у радио/чекбоксов в списках — без квадратной рамки (её даёт базовый .modal input) */
+.picklist .pick input { width: 19px; height: 19px; min-height: 0; padding: 0; border: none; accent-color: var(--acc); flex: 0 0 auto; }
+/* список без разделителей (напр. темп прогулок) */
+.picklist.nodiv .pick { border-bottom: none; }
 
 /* блоки модалки прибытия: тонированные секции на белом шите */
 .arrblock { background: var(--bg); border: none; border-radius: 14px; padding: 14px 15px; margin-top: 14px; }

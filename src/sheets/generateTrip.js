@@ -1,8 +1,9 @@
-/* Шит «Сгенерировать маршрут» — пошаговая форма онбординга (Этап 3).
- * Собирает вход для движка (город, даты, отель, темп, интересы, must-see,
- * фиксированные события), зовёт POST /api/generate и вливает готовый City в store.
- * См. docs/06-telegram-migration.md §2 (онбординг). */
+/* Шит «Новая поездка» — пошаговая форма онбординга (Этап 3).
+ * Собирает вход для движка (город, даты, отель/прилёт/заселение, темп, интересы,
+ * must-see, забронированные мероприятия), зовёт POST /api/generate и вливает
+ * готовый City в store. См. docs/06-telegram-migration.md §2 (онбординг). */
 import { DAY_THEMES } from '../config.js';
+import { ic } from '../icons.js';
 import { store, save } from '../store.js';
 import { render } from '../render.js';
 import { resetOv, openOv, closeOv } from '../ui/sheet.js';
@@ -10,13 +11,13 @@ import { api } from '../services/api.js';
 import { tg } from '../services/telegram.js';
 
 const PACE = [['low', 'Спокойный'], ['med', 'Средний'], ['high', 'Активный']];
-const STEPS = ['Город и даты', 'Отель и темп', 'Интересы', 'События'];
+const STEPS = ['Город и даты', 'Отель', 'Темп', 'Интересы', 'Мероприятия'];
 const TITLE = 'Новая поездка';
 
 export function generateTrip() {
   resetOv();
   // Состояние формы переживает перерисовку шагов.
-  const f = { step: 0, city: '', tripStart: '', end: '', hotel: '', pace: 'med', interests: [], mustSee: '', fixedEvents: '' };
+  const f = { step: 0, city: '', tripStart: '', end: '', hotel: '', arrival: '', departure: '', checkin: '', pace: 'med', interests: [], mustSee: '', fixedEvents: '' };
   renderStep(f);
   openOv();
 }
@@ -30,12 +31,16 @@ function collect(f) {
     f.end = v('g_end') ?? f.end;
   } else if (f.step === 1) {
     f.hotel = (v('g_hotel') ?? f.hotel).trim();
+    f.arrival = v('g_arr') ?? f.arrival;
+    f.departure = v('g_dep') ?? f.departure;
+    f.checkin = v('g_ci') ?? f.checkin;
+  } else if (f.step === 2) {
     const checked = document.querySelector('#ovBody input[name="g_pace"]:checked');
     if (checked) f.pace = checked.value;
-  } else if (f.step === 2) {
-    f.interests = [...document.querySelectorAll('#ovBody .pick input:checked')].map((x) => x.value);
-    f.mustSee = v('g_must') ?? f.mustSee;
   } else if (f.step === 3) {
+    f.interests = [...document.querySelectorAll('#ovBody .chip.on')].map((x) => x.dataset.v);
+    f.mustSee = v('g_must') ?? f.mustSee;
+  } else if (f.step === 4) {
     f.fixedEvents = v('g_events') ?? f.fixedEvents;
   }
 }
@@ -56,20 +61,29 @@ function renderStep(f) {
       + `<div class="two"><div><label>Первый день</label><input id="g_start" type="date" value="${esc(f.tripStart)}"></div>`
       + `<div><label>Последний день</label><input id="g_end" type="date" min="${esc(f.tripStart)}" value="${esc(f.end)}"></div></div>`;
   } else if (f.step === 1) {
-    html = `<label>Отель или район</label><input id="g_hotel" placeholder="можно позже" value="${esc(f.hotel)}">`
-      + `<label>Темп прогулок</label><div class="picklist">`
+    html = `<div class="arrblock"><div class="arrhdr"><img src="/emoji/arrival.png" alt=""> Перелёт</div>`
+      + `<div class="two arrtwo"><div><label>Прилёт</label><input id="g_arr" type="time" value="${esc(f.arrival)}"></div>`
+      + `<div><label>Вылет</label><input id="g_dep" type="time" value="${esc(f.departure)}"></div></div></div>`
+      + `<div class="arrblock"><div class="arrhdr"><img src="/emoji/hotel.png" alt=""> Заселение</div>`
+      + `<label>Отель или район</label><input id="g_hotel" placeholder="можно позже" value="${esc(f.hotel)}">`
+      + `<label>Заселение с</label><input id="g_ci" type="time" value="${esc(f.checkin)}"></div>`;
+  } else if (f.step === 2) {
+    html = `<label>Темп прогулок</label><div class="picklist nodiv">`
       + PACE.map(([val, t]) => `<label class="pick"><input type="radio" name="g_pace" value="${val}" ${f.pace === val ? 'checked' : ''}><span>${t}</span></label>`).join('')
       + `</div>`;
-  } else if (f.step === 2) {
-    html = `<label>Интересы</label><div class="picklist">`
-      + DAY_THEMES.map(([, t]) => `<label class="pick"><input type="checkbox" value="${t}" ${f.interests.includes(t) ? 'checked' : ''}><span>${t}</span></label>`).join('')
-      + `</div><label>Обязательно увидеть (по строке)</label><textarea id="g_must" rows="3" placeholder="напр.&#10;Эйфелева башня&#10;Лувр">${esc(f.mustSee)}</textarea>`;
   } else if (f.step === 3) {
-    html = `<label>Фиксированные события (по строке)</label>`
-      + `<textarea id="g_events" rows="4" placeholder="напр.&#10;Концерт — 2026-07-05 18:30&#10;Экскурсия Опера — 2026-07-06 10:00">${esc(f.fixedEvents)}</textarea>`
-      + `<div class="hint">Билеты и время — приложение учтёт их как якоря дней.</div>`;
+    html = `<label>Интересы</label><div class="chips">`
+      + DAY_THEMES.map(([, t, icon]) => `<button type="button" class="chip${f.interests.includes(t) ? ' on' : ''}" data-v="${esc(t)}">${ic(icon, 15)} ${t}</button>`).join('')
+      + `</div><label>Обязательно увидеть (по строке)</label><textarea id="g_must" rows="3" placeholder="Например:&#10;Эйфелева башня&#10;Лувр">${esc(f.mustSee)}</textarea>`;
+  } else if (f.step === 4) {
+    html = `<label>Забронированные мероприятия (необязательно)</label>`
+      + `<textarea id="g_events" rows="4" placeholder="Например:&#10;Концерт — 2026-07-05 18:30&#10;Экскурсия Опера — 2026-07-06 10:00">${esc(f.fixedEvents)}</textarea>`
+      + `<div class="hint">Напишите мероприятия, на которые у вас уже куплены билеты. Приложение учтёт их при составлении поездки.</div>`;
   }
   body.innerHTML = progBar(f.step, STEPS.length) + html;
+
+  // Чипсы интересов — тоггл по клику (не нативные инпуты).
+  body.querySelectorAll('.chip').forEach((ch) => { ch.onclick = () => { ch.classList.toggle('on'); tg.haptic('light'); }; });
 
   // Кнопки: Назад/Отмена слева, Далее/Сгенерировать справа.
   const cancel = document.getElementById('ovCancel');
@@ -98,7 +112,9 @@ async function submit(f) {
   body.innerHTML = `<div class="hint">Собираю маршрут по дням — это займёт несколько секунд…</div>`;
 
   const input = {
-    city: f.city, tripStart: f.tripStart, days: daysBetween(f.tripStart, f.end), hotel: f.hotel, pace: f.pace,
+    city: f.city, tripStart: f.tripStart, days: daysBetween(f.tripStart, f.end),
+    hotel: f.hotel, arrival: f.arrival, departure: f.departure, checkin: f.checkin,
+    pace: f.pace,
     interests: f.interests,
     mustSee: splitLines(f.mustSee),
     fixedEvents: splitLines(f.fixedEvents),

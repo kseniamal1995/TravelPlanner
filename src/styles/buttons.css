@@ -80,5 +80,6 @@ a.alink {
 .chip {
   border: 1px solid var(--line2); background: #fff; border-radius: 999px;
   padding: 10px 15px; font-family: inherit; font-weight: 700; font-size: 13px; color: var(--ink); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
 }
 .chip.on { background: var(--acc); border-color: var(--acc); color: #fff; }
