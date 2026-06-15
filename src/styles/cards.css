@@ -1,10 +1,9 @@
 /* ── Карточки и их содержимое ── */
 
-/* Общая поверхность карточек: без рамок, белое на тонированном фоне + мягкая тень. */
+/* Общая поверхность карточек: без рамок, белое на тонированном фоне, без тени. */
 .tripcard, .flow, .stop, .rcard {
   background: #fff;
   border: none;
-  box-shadow: var(--shadow-card);
 }
 
 /* карточка поездки */
@@ -56,7 +55,7 @@
 .inforow {
   width: 100%; display: flex; align-items: center; gap: 12px; margin: 14px 0;
   background: #fff; border: none; border-radius: 16px; padding: 11px 14px;
-  box-shadow: var(--shadow-card); cursor: pointer; font-family: inherit; text-align: left;
+  cursor: pointer; font-family: inherit; text-align: left;
 }
 /* иконка — того же размера, что превью у карточек мест (.thumb) */
 .inforow-ic {
@@ -70,9 +69,8 @@
 
 /* карточка места */
 .stop {
-  border-radius: 20px; padding: 15px 16px; margin: 12px 0; cursor: pointer; transition: box-shadow .25s;
+  border-radius: 20px; padding: 15px 16px; margin: 12px 0; cursor: pointer;
 }
-.stop.open { box-shadow: var(--shadow-card-lg); }
 .stophead { display: flex; align-items: flex-start; gap: 10px; }
 .stophead .nm { flex: 1; min-width: 0; }
 .nmt { font-size: 16.5px; line-height: 1.25; }
@@ -178,10 +176,10 @@
 /* напоминания */
 .rcard {
   border-radius: 18px; padding: 13px 14px; margin: 10px 0;
-  display: flex; gap: 10px; align-items: flex-start;
+  display: flex; gap: 4px; align-items: flex-start;
 }
-.rchk { flex: 0 0 auto; padding: 10px; margin: -8px 0 -8px -8px; cursor: pointer; display: flex; }
-.rchk input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--green); }
+.rchk { flex: 0 0 auto; padding: 8px; margin: -6px 0 -8px -8px; cursor: pointer; display: flex; }
+.rchk input { width: 16px; height: 16px; margin-top: 3px; accent-color: var(--acc); border-radius: 5px; }
 .rcard .rt2 { font-weight: 700; font-size: 14px; }
 .rcard .due { font-size: 12px; font-weight: 700; margin-top: 3px; display: inline-block; padding: 2px 8px; border-radius: 8px; }
 .due.soon { background: var(--amber-bg); color: var(--amber); }

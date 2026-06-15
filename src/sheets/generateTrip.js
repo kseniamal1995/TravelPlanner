@@ -40,28 +40,36 @@ function collect(f) {
   }
 }
 
+function progBar(step, total) {
+  let s = '';
+  for (let i = 0; i < total; i++) s += `<span class="seg${i <= step ? ' on' : ''}"></span>`;
+  return `<div class="prog">${s}</div>`;
+}
+
 function renderStep(f) {
-  document.getElementById('ovTitle').textContent = `${TITLE} · ${f.step + 1}/${STEPS.length}`;
+  document.getElementById('ovTitle').textContent = TITLE;
   const body = document.getElementById('ovBody');
+  let html = '';
 
   if (f.step === 0) {
-    body.innerHTML = `<label>Город</label><input id="g_city" placeholder="напр. Лиссабон" value="${esc(f.city)}">`
-      + `<label>Даты поездки</label><div class="two"><div><label class="sub">С</label><input id="g_start" type="date" value="${esc(f.tripStart)}"></div>`
-      + `<div><label class="sub">По</label><input id="g_end" type="date" min="${esc(f.tripStart)}" value="${esc(f.end)}"></div></div>`;
+    html = `<label>Город</label><input id="g_city" placeholder="напр. Лиссабон" value="${esc(f.city)}">`
+      + `<div class="two"><div><label>Первый день</label><input id="g_start" type="date" value="${esc(f.tripStart)}"></div>`
+      + `<div><label>Последний день</label><input id="g_end" type="date" min="${esc(f.tripStart)}" value="${esc(f.end)}"></div></div>`;
   } else if (f.step === 1) {
-    body.innerHTML = `<label>Отель или район</label><input id="g_hotel" placeholder="можно позже" value="${esc(f.hotel)}">`
+    html = `<label>Отель или район</label><input id="g_hotel" placeholder="можно позже" value="${esc(f.hotel)}">`
       + `<label>Темп прогулок</label><div class="picklist">`
       + PACE.map(([val, t]) => `<label class="pick"><input type="radio" name="g_pace" value="${val}" ${f.pace === val ? 'checked' : ''}><span>${t}</span></label>`).join('')
       + `</div>`;
   } else if (f.step === 2) {
-    body.innerHTML = `<label>Интересы</label><div class="picklist">`
+    html = `<label>Интересы</label><div class="picklist">`
       + DAY_THEMES.map(([, t]) => `<label class="pick"><input type="checkbox" value="${t}" ${f.interests.includes(t) ? 'checked' : ''}><span>${t}</span></label>`).join('')
       + `</div><label>Обязательно увидеть (по строке)</label><textarea id="g_must" rows="3" placeholder="напр.&#10;Эйфелева башня&#10;Лувр">${esc(f.mustSee)}</textarea>`;
   } else if (f.step === 3) {
-    body.innerHTML = `<label>Фиксированные события (по строке)</label>`
+    html = `<label>Фиксированные события (по строке)</label>`
       + `<textarea id="g_events" rows="4" placeholder="напр.&#10;Концерт — 2026-07-05 18:30&#10;Экскурсия Опера — 2026-07-06 10:00">${esc(f.fixedEvents)}</textarea>`
       + `<div class="hint">Билеты и время — приложение учтёт их как якоря дней.</div>`;
   }
+  body.innerHTML = progBar(f.step, STEPS.length) + html;
 
   // Кнопки: Назад/Отмена слева, Далее/Сгенерировать справа.
   const cancel = document.getElementById('ovCancel');

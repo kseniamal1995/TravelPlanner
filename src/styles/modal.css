@@ -9,7 +9,11 @@
   padding: 12px 18px calc(28px + env(safe-area-inset-bottom)); max-height: 90vh; overflow: auto;
 }
 .modal::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--line2); margin: 0 auto 14px; }
-.modal h3 { font-size: 20px; margin-bottom: 16px; }
+.modal h3 { font-size: 20px; margin-bottom: 14px; }
+/* сегментный прогресс шагов формы (под заголовком) */
+.prog { display: flex; gap: 6px; margin: 0 0 8px; }
+.prog .seg { flex: 1; height: 4px; border-radius: 2px; background: var(--line2); transition: background .25s; }
+.prog .seg.on { background: var(--acc); }
 .modal label { display: block; font-size: 12px; font-weight: 600; color: var(--soft); margin: 12px 0 4px; }
 .modal input, .modal select, .modal textarea {
   width: 100%; border: 1.5px solid var(--line2); border-radius: 12px; padding: 10px;
