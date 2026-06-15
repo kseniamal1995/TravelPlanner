@@ -16,7 +16,7 @@
 .prog .seg.on { background: var(--acc); }
 /* отступ после прогресс-бара задаётся самим .prog — у первого элемента верхний отступ убираем */
 .prog + label, .prog + .arrblock { margin-top: 0; }
-.modal label { display: block; font-size: 12px; font-weight: 600; color: var(--soft); margin: 12px 0 4px; }
+.modal label { display: block; font-size: 12px; font-weight: 600; color: var(--soft); margin: 18px 0 6px; }
 .modal input, .modal select, .modal textarea {
   width: 100%; border: 1.5px solid var(--line2); border-radius: 12px; padding: 10px;
   min-height: 46px; font-family: inherit; font-size: 15px; background: #fff; color: var(--ink);
@@ -26,6 +26,11 @@
   outline: none; border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-bg);
 }
 .modal .hint { font-size: 13px; color: var(--soft); font-weight: 400; line-height: 1.5; margin-top: 10px; }
+/* состояние генерации маршрута */
+.genwait { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 22px 0 6px; text-align: center; }
+.genwait .hint { margin-top: 0; max-width: 320px; }
+.genspin { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--line2); border-top-color: var(--acc); animation: genspin .8s linear infinite; }
+@keyframes genspin { to { transform: rotate(360deg); } }
 .modal .two { display: flex; gap: 10px; }
 .modal .two > div { flex: 1; }
 .modal .row { display: flex; gap: 14px; justify-content: flex-end; margin-top: 24px; }
@@ -48,7 +53,7 @@
 .picklist.nodiv .pick { border-bottom: none; padding: 8px 2px; }
 
 /* блоки модалки прибытия: тонированные секции на белом шите */
-.arrblock { background: var(--bg); border: none; border-radius: 14px; padding: 14px 15px; margin-top: 14px; }
+.arrblock { background: var(--bg); border: none; border-radius: 14px; padding: 14px 15px; margin-top: 18px; }
 .arrblock:first-child { margin-top: 0; }
 .arrhdr { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--ink); }
 .arrhdr img { width: 22px; height: 22px; object-fit: contain; flex: 0 0 auto; }

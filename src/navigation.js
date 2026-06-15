@@ -33,6 +33,13 @@ export function goRem(scope) {
   render();
 }
 
+/** Скрыть онбординг-подсказку в «Идеях» (после первой генерации). */
+export function dismissIdeasHint() {
+  store.S.ideasHint = false;
+  save();
+  render();
+}
+
 /** Переключить таб напоминаний (клик по табу). */
 export function setRemTab(id) {
   if (store.remTab === id) return;

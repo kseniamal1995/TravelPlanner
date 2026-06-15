@@ -13,6 +13,7 @@ export const store = {
   ideasTab: 'shop',    // активная под-вкладка идей
   remTab: 'all',       // активный таб напоминаний: 'all' | cityId
   undoSnap: null,      // снапшот для undo
+  generating: false,   // идёт генерация маршрута (блокирует закрытие шита)
   animPending: false,  // ставить ли класс .anim при следующем рендере
   flashId: null,       // id только что добавленного места (вспышка)
 };

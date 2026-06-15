@@ -109,9 +109,11 @@ function renderStep(f) {
 async function submit(f) {
   const sv = document.getElementById('ovSave');
   const body = document.getElementById('ovBody');
+  store.generating = true;                 // блокирует закрытие шита по тапу на подложку
   sv.disabled = true; sv.textContent = 'Генерирую…';
+  document.getElementById('ovCancel').style.display = 'none';
   document.getElementById('ovCancel').onclick = null;
-  body.innerHTML = `<div class="hint">Собираю маршрут по дням — это займёт несколько секунд…</div>`;
+  body.innerHTML = `<div class="genwait"><div class="genspin"></div><div class="hint">Собираю маршрут по дням — это займёт до минуты. Не закрывай окно.</div></div>`;
 
   const input = {
     city: f.city, tripStart: f.tripStart, days: daysBetween(f.tripStart, f.end),
@@ -122,11 +124,14 @@ async function submit(f) {
     fixedEvents: splitLines(f.fixedEvents),
   };
 
+  const firstTrip = Object.keys(store.S.cities).length === 0; // первая поездка пользователя
   try {
     const { city, mock } = await api.generate(input);
+    store.generating = false;
     store.S.cities[city.id] = city;
     store.S.activeCity = city.id;
     store.view = 'plan';
+    if (firstTrip) store.S.ideasHint = true; // онбординг «Идеи» после первой генерации
     await save();
     tg.haptic('success');
     closeOv();
@@ -134,9 +139,10 @@ async function submit(f) {
     render();
     if (mock) console.warn('Маршрут сгенерирован в MOCK-режиме (нет ANTHROPIC_API_KEY).');
   } catch (e) {
+    store.generating = false;
     body.innerHTML = `<div class="hint">${esc(e.message)}</div>`;
     const c = document.getElementById('ovCancel');
-    c.textContent = 'Назад'; c.onclick = () => { f.step = STEPS.length - 1; renderStep(f); };
+    c.style.display = ''; c.textContent = 'Назад'; c.onclick = () => { f.step = STEPS.length - 1; renderStep(f); };
     sv.disabled = false; sv.textContent = 'Повторить';
     sv.onclick = () => submit(f);
   }

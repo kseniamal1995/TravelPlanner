@@ -35,22 +35,26 @@ export function stopHtml(p, c, dly) {
   h += `<div class="cbody"><div class="cbin">`;
   if (p.visit) h += `<div class="vtime">${ic('clock', 13)} ${esc(p.visit)}</div>`;
   if (p.booked) h += `<div class="booked">${ic('check', 13)} Забронировано${p.bt ? ' · ' + p.bt : ''}</div>`;
-  if (p.desc) h += `<div class="desc">${esc(p.desc)}</div>`;
-  if (p.warnH) h += `<div class="warn warn-h">${ic('clock', 15)} <div>${p.warnH}</div></div>`;
-  if (p.warnS) h += `<div class="warn warn-s">${ic('warn', 15)} <div>${p.warnS}</div></div>`;
+  if (p.desc) h += `<div class="desc">${esc(stripUrl(p.desc))}</div>`;
+  if (p.warnH) h += `<div class="warn warn-h">${ic('clock', 15)} <div>${esc(stripUrl(p.warnH))}</div></div>`;
+  if (p.warnS) h += `<div class="warn warn-s">${ic('warn', 15)} <div>${esc(stripUrl(p.warnS))}</div></div>`;
   if (p.ticket || p.bought) {
     let tkr = `<div class="tk">`;
     if (p.skipTk && !p.bought && !p.booked) {
       // решение «иду без билета»: одна приглушённая строка + возврат
-      tkr += `<span class="tkskip">${ic('ticket', 13)} Без билета — смотрю снаружи</span><button class="ghostbtn" data-act="skiptk" data-id="${p.id}">Нужен билет</button>`;
-    } else {
-      if (!p.booked) {
-        if (!p.bought && p.ticket) tkr += `<span class="chip">${ic('ticket', 13)} ${esc(p.ticket.price)}</span>`;
-        tkr += `<button class="tkbtn${p.bought ? ' done' : ''}" data-act="buy" data-id="${p.id}">${p.bought ? ic('check', 15) + ' Билет куплен' : 'Билет куплен?'}</button>`;
-        if (!p.bought) tkr += `<button class="ghostbtn" data-act="skiptk" data-id="${p.id}">Не покупать</button>`;
-      }
-      if (p.ticket && p.ticket.url) tkr += `<a class="alink" href="${p.ticket.url}" target="_blank" rel="noopener">${ic('ticket', 13)} Билеты ${EXT}</a>`;
-      if (p.ticket && p.ticket.lead && !p.booked && !p.bought) tkr += `<div class="lead">${p.ticket.lead}</div>`;
+      tkr += `<span class="tkskip">${ic('ticket', 13)} Без билета — смотрю снаружи</span><button class="tklink" data-act="skiptk" data-id="${p.id}">Нужен билет</button>`;
+    } else if (p.bought) {
+      tkr += `<button class="tkbtn done" data-act="buy" data-id="${p.id}">${ic('check', 15)} Билет куплен</button>`;
+    } else if (p.booked) {
+      if (p.ticket && p.ticket.url) tkr += `<a class="tkbuy" href="${p.ticket.url}" target="_blank" rel="noopener">${ic('ticket', 13)} Билеты ${EXT}</a>`;
+    } else if (p.ticket) {
+      // объединённая пилюля цена+покупка, компактный тоггл «куплено» и приглушённый «не нужен»
+      const price = p.ticket.price ? esc(p.ticket.price) : 'Билет';
+      if (p.ticket.url) tkr += `<a class="tkbuy" href="${p.ticket.url}" target="_blank" rel="noopener">${ic('ticket', 13)} ${price} ${EXT}</a>`;
+      else tkr += `<span class="chip">${ic('ticket', 13)} ${price}</span>`;
+      tkr += `<button class="tkbtn" data-act="buy" data-id="${p.id}">Куплено?</button>`;
+      tkr += `<button class="tklink" data-act="skiptk" data-id="${p.id}">не нужен</button>`;
+      if (p.ticket.lead) tkr += `<div class="lead">${esc(stripUrl(p.ticket.lead))}</div>`;
     }
     h += tkr + `</div>`;
   }
@@ -64,4 +68,9 @@ export function stopHtml(p, c, dly) {
   h += `<div class="editbody"><textarea class="usernote" placeholder="Заметка…" data-act="note" data-id="${p.id}">${esc(p.userNote)}</textarea><div class="editctrl"><select class="mv" data-act="move" data-id="${p.id}">${opts}</select><button class="ic2 del" data-act="del" data-id="${p.id}">${TRASH}</button></div></div>`;
   h += `</div></div></div>`;
   return h;
+}
+
+/** Убрать голые URL из текста (ссылка живёт в кнопке «Билеты», текст её дублировал). */
+function stripUrl(s) {
+  return String(s ?? '').replace(/https?:\/\/\S+/g, '').replace(/\s{2,}/g, ' ').trim();
 }
