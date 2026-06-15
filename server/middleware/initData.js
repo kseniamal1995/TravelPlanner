@@ -10,6 +10,9 @@ import crypto from 'node:crypto';
 const BOT_TOKEN = process.env.BOT_TOKEN || '';
 const DEV_USER_ID = process.env.DEV_USER_ID || 'dev';
 const MAX_AGE = parseInt(process.env.INITDATA_MAX_AGE || '86400', 10);
+// Белый список Telegram user id (через запятую). Если задан — доступ только этим
+// пользователям (защита от чужих запросов к платному AI). Пусто = без ограничения.
+const ALLOWED = (process.env.ALLOWED_USER_IDS || '').split(',').map((s) => s.trim()).filter(Boolean);
 
 /** Проверить подпись и вернуть распарсенные поля или null. */
 function verify(initData) {
@@ -52,6 +55,10 @@ export function initDataAuth(req, res, next) {
   try {
     const user = JSON.parse(params.get('user') || '{}');
     if (!user.id) return res.status(401).json({ error: 'no user' });
+    // Белый список: пускаем только разрешённых пользователей (если список задан).
+    if (ALLOWED.length && !ALLOWED.includes(String(user.id))) {
+      return res.status(403).json({ error: 'access restricted' });
+    }
     req.userId = 'tg:' + user.id;
   } catch {
     return res.status(401).json({ error: 'bad user payload' });
