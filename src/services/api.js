@@ -44,4 +44,15 @@ export const api = {
     }
     return r.json();
   },
+
+  /** Догенерировать один день к поездке. Возвращает { theme, places, mock? }. */
+  async generateDay(input) {
+    const r = await fetch(`${BASE}/generate-day`, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify(input),
+    });
+    if (!r.ok) throw new Error('Не удалось сгенерировать день (' + r.status + ')');
+    return r.json();
+  },
 };

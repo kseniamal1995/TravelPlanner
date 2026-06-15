@@ -3,9 +3,29 @@
    → { city: City, mock?: true }  (City — docs/03-data-model.md, готов для store). */
 import { Router } from 'express';
 import { initDataAuth } from '../middleware/initData.js';
-import { generateTrip } from '../services/llm.js';
+import { generateTrip, generateDay } from '../services/llm.js';
 
 const router = Router();
+
+// Догенерировать один день к существующей поездке.
+router.post('/generate-day', initDataAuth, async (req, res) => {
+  const b = req.body || {};
+  const city = String(b.city || '').trim();
+  if (!city) return res.status(400).json({ error: 'city is required' });
+  const input = {
+    city,
+    dayIndex: parseInt(b.dayIndex, 10) || 0,
+    pace: ['low', 'med', 'high'].includes(b.pace) ? b.pace : 'med',
+    interests: Array.isArray(b.interests) ? b.interests.map(String) : [],
+    existing: Array.isArray(b.existing) ? b.existing.map(String) : [],
+  };
+  try {
+    res.json(await generateDay(input));
+  } catch (e) {
+    console.error('generate-day failed:', e.message);
+    res.status(502).json({ error: 'generation failed', detail: e.message });
+  }
+});
 
 router.post('/generate', initDataAuth, async (req, res) => {
   const b = req.body || {};

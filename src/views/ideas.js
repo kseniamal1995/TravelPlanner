@@ -15,6 +15,6 @@ export function ideasHtml() {
   const list = c.places.filter((p) => p.bucket === store.ideasTab).sort((a, b) => a.order - b.order);
   if (!list.length) t += emptyHtml('bulb', 'Пока пусто', '');
   list.forEach((p, i) => { t += stopHtml(p, c, Math.min(i, 8) * 28); });
-  t += `<div class="actions"><button class="btn acc" onclick="openAdd()">${ic('plus', 15)} Добавить место</button></div>`;
+  t += `<div class="${list.length ? 'actions' : 'emptyact'}"><button class="btn acc" onclick="openAdd()">${ic('plus', 15)} Добавить место</button></div>`;
   return t;
 }

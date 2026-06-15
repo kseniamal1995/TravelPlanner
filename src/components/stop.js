@@ -39,21 +39,19 @@ export function stopHtml(p, c, dly) {
   if (p.warnH) h += `<div class="warn warn-h">${ic('clock', 15)} <div>${esc(stripUrl(p.warnH))}</div></div>`;
   if (p.warnS) h += `<div class="warn warn-s">${ic('warn', 15)} <div>${esc(stripUrl(p.warnS))}</div></div>`;
   if (p.ticket || p.bought) {
+    // чекбокс-тоггл «Билет есть»
+    const have = (on) => `<button class="tkhave${on ? ' on' : ''}" data-act="buy" data-id="${p.id}"><span class="box">${on ? ic('check', 13) : ''}</span> Билет есть</button>`;
     let tkr = `<div class="tk">`;
-    if (p.skipTk && !p.bought && !p.booked) {
-      // решение «иду без билета»: одна приглушённая строка + возврат
-      tkr += `<span class="tkskip">${ic('ticket', 13)} Без билета — смотрю снаружи</span><button class="tklink" data-act="skiptk" data-id="${p.id}">Нужен билет</button>`;
-    } else if (p.bought) {
-      tkr += `<button class="tkbtn done" data-act="buy" data-id="${p.id}">${ic('check', 15)} Билет куплен</button>`;
+    if (p.bought) {
+      tkr += have(true);
     } else if (p.booked) {
       if (p.ticket && p.ticket.url) tkr += `<a class="tkbuy" href="${p.ticket.url}" target="_blank" rel="noopener">${ic('ticket', 13)} Билеты ${EXT}</a>`;
     } else if (p.ticket) {
-      // объединённая пилюля цена+покупка, компактный тоггл «куплено» и приглушённый «не нужен»
+      // объединённая пилюля «цена + купить» + чекбокс «Билет есть»
       const price = p.ticket.price ? esc(p.ticket.price) : 'Билет';
       if (p.ticket.url) tkr += `<a class="tkbuy" href="${p.ticket.url}" target="_blank" rel="noopener">${ic('ticket', 13)} ${price} ${EXT}</a>`;
       else tkr += `<span class="chip">${ic('ticket', 13)} ${price}</span>`;
-      tkr += `<button class="tkbtn" data-act="buy" data-id="${p.id}">Куплено?</button>`;
-      tkr += `<button class="tklink" data-act="skiptk" data-id="${p.id}">не нужен</button>`;
+      tkr += have(false);
       if (p.ticket.lead) tkr += `<div class="lead">${esc(stripUrl(p.ticket.lead))}</div>`;
     }
     h += tkr + `</div>`;

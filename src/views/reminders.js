@@ -52,6 +52,6 @@ export function remHtml() {
     t += `<div class="rcard${open ? ' open' : ''}" style="--d:${Math.min(ri, 8) * 28}ms"><label class="rchk"><input type="checkbox" ${r.done ? 'checked' : ''} data-act="rem" data-id="${r.id}" data-cid="${r.cid}"></label><div class="rmain${sp[1] ? ' tappable' : ''}"${sp[1] ? ` data-act="remtoggle" data-id="${r.id}"` : ''}><div class="rt2 ${r.done ? 'done' : ''}">${esc(sp[0])}${sp[1] ? `<span class="chev">${CHDN}</span>` : ''}</div>${sp[1] ? `<div class="rdet"><div class="cbin"><div class="rdtext">${esc(sp[1])}</div></div></div>` : ''}<div class="rmeta">${all ? `<span class="rcity">${esc(r.city)}</span>` : ''}${txt ? `<span class="due ${cls}">${txt}</span>` : ''}${r.url ? `<a class="alink" href="${r.url}" target="_blank" rel="noopener">Открыть ${EXT}</a>` : ''}</div></div></div>`;
   });
   // «+» добавляет в конкретную поездку → показываем только когда выбран её таб.
-  if (!all && S.cities[tab]) t += `<div class="actions"><button class="btn acc" onclick="openRem('${tab}')">${ic('plus', 15)} Напоминание</button></div>`;
+  if (!all && S.cities[tab]) t += `<div class="${items.length ? 'actions' : 'emptyact'}"><button class="btn acc" onclick="openRem('${tab}')">${ic('plus', 15)} Напоминание</button></div>`;
   return t;
 }

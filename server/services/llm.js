@@ -141,6 +141,51 @@ export async function generateTrip(input) {
   return { city: await buildCity(input, gen), mock: false };
 }
 
+/** Догенерировать ОДИН дополнительный день к существующей поездке.
+ *  input: { city, dayIndex, pace, interests, existing: [имена уже добавленных мест] }
+ *  Возвращает { theme, places: [Place] } (bucket пустой — его проставит клиент). */
+export async function generateDay(input) {
+  if (!API_KEY) {
+    const places = [
+      await normalizePlace({ name: `${input.city}: новое место`, cat: 'sight', desc: '[MOCK] Подключи ключ.' }, '', 0, input.city, false),
+    ];
+    return { theme: 'Новый день', places, mock: true };
+  }
+  const gen = await callClaudeDay(input);
+  const places = [];
+  let j = 0;
+  for (const p of (gen.places || []).slice(0, 7)) places.push(await normalizePlace(p, '', j++, input.city));
+  return { theme: gen.theme || '', places, mock: false };
+}
+
+async function callClaudeDay(input) {
+  const profile = await getCityProfile(input.city, PROFILE_TTL);
+  const payload = {
+    task: 'Составь ОДИН дополнительный день поездки по правилам выше. Верни СТРОГО JSON { theme, places:[…] } (как один элемент days[]). Не повторяй уже выбранные места.',
+    input: { city: input.city, dayIndex: input.dayIndex, pace: input.pace, interests: input.interests },
+    avoidPlaces: (input.existing || []).slice(0, 80),
+    cachedCityProfile: profile || null,
+    outputSchemaHint: { theme: 'тема дня', places: '[ { name, cat, rating, rname, wiki, desc, visit, leg:{m,t}, ticket:{price,lead,url}, warnH, warnS, sect } ]' },
+  };
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: 3000,
+      system: [
+        { type: 'text', text: RULES, cache_control: { type: 'ephemeral' } },
+        { type: 'text', text: 'Отвечай только валидным JSON-объектом без markdown-обёртки.' },
+      ],
+      messages: [{ role: 'user', content: JSON.stringify(payload) }],
+    }),
+  });
+  if (!res.ok) throw new Error('Anthropic ' + res.status + ': ' + (await res.text()).slice(0, 300));
+  const data = await res.json();
+  const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+  return parseJson(text);
+}
+
 /** Вызов Claude Messages API. Возвращает распарсенный объект генерации. */
 async function callClaude(input, profile, known) {
   const userPayload = {

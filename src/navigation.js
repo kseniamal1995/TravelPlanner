@@ -5,6 +5,8 @@ import { render } from './render.js';
 import { plural, uid } from './lib/format.js';
 import { showToast } from './ui/toast.js';
 import { tg } from './services/telegram.js';
+import { api } from './services/api.js';
+import { openOv, closeOv } from './ui/sheet.js';
 
 export function goHome() {
   store.view = 'home';
@@ -71,15 +73,49 @@ export function goView(v) {
   render();
 }
 
-/** Добавить день (таб «+»): пустой день в конец, сразу открывается. */
-export function addDay() {
+/** Добавить день (таб «+»): создаём день и догенерируем для него места через AI. */
+export async function addDay() {
   const c = city();
   snapshot();
-  c.days.push({ id: 'd' + uid(), mode: 'walking', first: null });
-  c.activeTab = c.days[c.days.length - 1].id;
+  const dayId = 'd' + uid();
+  c.days.push({ id: dayId, mode: 'walking', first: null, theme: '' });
+  c.activeTab = dayId;
   store.animPending = true;
   save();
   render();
+
+  // Спиннер генерации в шите (закрытие заблокировано флагом store.generating).
+  document.getElementById('ovTitle').textContent = 'Новый день';
+  document.getElementById('ovBody').innerHTML = `<div class="genwait"><div class="genspin"></div><div class="hint">Подбираю места на новый день…</div></div>`;
+  const cancel = document.getElementById('ovCancel');
+  const sv = document.getElementById('ovSave');
+  cancel.style.display = 'none';
+  sv.style.display = 'none';
+  store.generating = true;
+  openOv();
+
+  try {
+    const interests = ((c.days.find((d) => d.theme) || {}).theme || '').split(/[·,]/).map((s) => s.trim()).filter(Boolean);
+    const existing = c.places.map((p) => p.name);
+    const { theme, places } = await api.generateDay({ city: c.name, dayIndex: c.days.length - 1, pace: 'med', interests, existing });
+    store.generating = false;
+    const day = c.days.find((d) => d.id === dayId);
+    if (day && theme) day.theme = theme;
+    let order = 0;
+    (places || []).forEach((p) => { p.id = 'p' + uid(); p.bucket = dayId; p.order = order++; c.places.push(p); });
+    save();
+    closeOv();
+    store.animPending = true;
+    render();
+    tg.haptic('success');
+  } catch {
+    store.generating = false;
+    closeOv();
+    showToast('Не удалось сгенерировать день — добавь места вручную', 0);
+  } finally {
+    cancel.style.display = '';
+    sv.style.display = '';
+  }
 }
 
 export function delDay(id) {
