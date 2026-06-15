@@ -16,7 +16,7 @@ const TITLE = 'Новая поездка';
 export function generateTrip() {
   resetOv();
   // Состояние формы переживает перерисовку шагов.
-  const f = { step: 0, city: '', tripStart: '', days: 3, hotel: '', pace: 'med', interests: [], mustSee: '', fixedEvents: '' };
+  const f = { step: 0, city: '', tripStart: '', end: '', hotel: '', pace: 'med', interests: [], mustSee: '', fixedEvents: '' };
   renderStep(f);
   openOv();
 }
@@ -27,7 +27,7 @@ function collect(f) {
   if (f.step === 0) {
     f.city = (v('g_city') ?? f.city).trim();
     f.tripStart = v('g_start') ?? f.tripStart;
-    f.days = Math.max(1, parseInt(v('g_days'), 10) || f.days);
+    f.end = v('g_end') ?? f.end;
   } else if (f.step === 1) {
     f.hotel = (v('g_hotel') ?? f.hotel).trim();
     const checked = document.querySelector('#ovBody input[name="g_pace"]:checked');
@@ -46,8 +46,8 @@ function renderStep(f) {
 
   if (f.step === 0) {
     body.innerHTML = `<label>Город</label><input id="g_city" placeholder="напр. Лиссабон" value="${esc(f.city)}">`
-      + `<div class="two"><div><label>Первый день</label><input id="g_start" type="date" value="${esc(f.tripStart)}"></div>`
-      + `<div><label>Дней</label><input id="g_days" type="number" min="1" value="${f.days}"></div></div>`;
+      + `<label>Даты поездки</label><div class="two"><div><label class="sub">С</label><input id="g_start" type="date" value="${esc(f.tripStart)}"></div>`
+      + `<div><label class="sub">По</label><input id="g_end" type="date" min="${esc(f.tripStart)}" value="${esc(f.end)}"></div></div>`;
   } else if (f.step === 1) {
     body.innerHTML = `<label>Отель или район</label><input id="g_hotel" placeholder="можно позже" value="${esc(f.hotel)}">`
       + `<label>Темп прогулок</label><div class="picklist">`
@@ -90,7 +90,7 @@ async function submit(f) {
   body.innerHTML = `<div class="hint">Собираю маршрут по дням — это займёт несколько секунд…</div>`;
 
   const input = {
-    city: f.city, tripStart: f.tripStart, days: f.days, hotel: f.hotel, pace: f.pace,
+    city: f.city, tripStart: f.tripStart, days: daysBetween(f.tripStart, f.end), hotel: f.hotel, pace: f.pace,
     interests: f.interests,
     mustSee: splitLines(f.mustSee),
     fixedEvents: splitLines(f.fixedEvents),
@@ -118,6 +118,15 @@ async function submit(f) {
 
 function splitLines(s) {
   return String(s || '').split('\n').map((x) => x.trim()).filter(Boolean);
+}
+
+/** Число дней поездки (включительно) из диапазона дат. Дефолт 3, если даты не заданы. */
+function daysBetween(start, end) {
+  if (!start || !end) return 3;
+  const a = new Date(start + 'T00:00:00');
+  const b = new Date(end + 'T00:00:00');
+  const d = Math.round((b - a) / 86400000) + 1;
+  return d >= 1 ? d : 1;
 }
 
 function esc(s) {
