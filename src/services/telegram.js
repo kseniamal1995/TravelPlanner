@@ -23,22 +23,12 @@ export function tgInitData() {
   return wa ? (wa.initData || '') : '';
 }
 
-/** Маппинг themeParams Telegram на CSS-токены (тёмная тема). Бренд (зелёный акцент,
- *  серифные заголовки) сохраняем поверх темы — см. docs/04. Заготовка на фазу 1. */
+/** Тема. Сейчас СПЕЦИАЛЬНО не переносим цвета Telegram на токены: приложение
+ *  должно сохранять собственный бренд (свой фон #F4F5F8, акценты, серифные
+ *  заголовки — см. docs/04), а не перекрашиваться под белую/тёмную тему клиента.
+ *  Когда понадобится тёмная тема — включим маппинг через отдельный набор токенов. */
 function applyTheme() {
-  if (!wa || !wa.themeParams) return;
-  const t = wa.themeParams;
-  const root = document.documentElement.style;
-  const map = {
-    '--bg': t.bg_color,
-    '--card': t.secondary_bg_color,
-    '--ink': t.text_color,
-    '--soft': t.hint_color,
-    '--blue': t.link_color,
-  };
-  for (const [token, value] of Object.entries(map)) {
-    if (value) root.setProperty(token, value);
-  }
+  /* no-op: бренд приоритетнее themeParams */
 }
 
 export const tg = {

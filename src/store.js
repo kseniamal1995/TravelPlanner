@@ -47,8 +47,9 @@ export function save() {
 }
 
 /**
- * Загрузить состояние и при необходимости мигрировать на актуальный seed.
- * Перенос пользовательских полей описан в docs/03-data-model.md «Миграции».
+ * Загрузить состояние пользователя. Каждый пользователь начинает с ПУСТОГО
+ * состояния — поездки создаёт он сам (генерацией). Seed Парижа больше не
+ * подставляется (остаётся только эталоном качества для движка, см. docs/01).
  */
 export async function initState() {
   let st = null;
@@ -57,35 +58,11 @@ export async function initState() {
     if (raw) st = JSON.parse(raw);
   } catch { /* битый JSON → как будто пусто */ }
 
-  const sd = seed();
-  if (!st) {
-    st = sd;
-  } else if ((st.version || 0) < sd.version) {
-    st.version = sd.version;
-    const old = {}, rem = {};
-    for (const cid in (st.cities || {})) {
-      (st.cities[cid].places || []).forEach((p) => {
-        old[cid + '::' + p.id] = { bought: p.bought, userNote: p.userNote, done: p.done, skipTk: p.skipTk };
-      });
-      (st.cities[cid].reminders || []).forEach((r) => { rem[cid + '::' + r.id] = r.done; });
-    }
-    for (const cid in sd.cities) {
-      sd.cities[cid].places.forEach((p) => {
-        const k = cid + '::' + p.id;
-        if (old[k]) { p.bought = old[k].bought; p.userNote = old[k].userNote; p.done = old[k].done; p.skipTk = old[k].skipTk; }
-      });
-      (sd.cities[cid].reminders || []).forEach((r) => {
-        const k = cid + '::' + r.id;
-        if (rem[k] !== undefined) r.done = rem[k];
-      });
-    }
-    // Перенести города/места, добавленные пользователем (которых нет в seed).
-    for (const cid in (st.cities || {})) {
-      if (!sd.cities[cid]) { sd.cities[cid] = st.cities[cid]; continue; }
-      const ids = new Set(sd.cities[cid].places.map((p) => p.id));
-      (st.cities[cid].places || []).forEach((p) => { if (!ids.has(p.id)) sd.cities[cid].places.push(p); });
-    }
-    st = sd;
+  const version = seed().version; // версия схемы (без подстановки демо-данных)
+  if (!st || typeof st !== 'object' || !st.cities) {
+    st = { version, activeCity: null, cities: {} };
+  } else {
+    st.version = version; // помечаем актуальной; пользовательские поездки сохраняем как есть
   }
 
   if (st.activeCity === undefined) st.activeCity = null;

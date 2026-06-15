@@ -23,6 +23,5 @@ export function homeHtml() {
   if (!cards) cards = emptyHtml('route', 'Пока нет поездок', 'Создай первую — соберём маршрут по дням');
   return `<div class="home"><div class="homehdr"><div><div class="kicker">личный планер</div><h1>Маршруты</h1></div><button class="iconbtn" onclick="goRem('all')">${ic('bell', 16)} Напоминания</button></div>
     ${cards}
-    <button class="bigbtn acc" onclick="generateTrip()">${ic('sparkles', 16)} Сгенерировать маршрут</button>
-    <button class="bigbtn" onclick="newTrip()">${ic('plus', 16)} Новая поездка</button></div>`;
+    <button class="bigbtn acc" onclick="generateTrip()">${ic('plus', 16)} Новая поездка</button></div>`;
 }

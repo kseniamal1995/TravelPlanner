@@ -11,6 +11,7 @@ import { tg } from '../services/telegram.js';
 
 const PACE = [['low', 'Спокойный'], ['med', 'Средний'], ['high', 'Активный']];
 const STEPS = ['Город и даты', 'Отель и темп', 'Интересы', 'События'];
+const TITLE = 'Новая поездка';
 
 export function generateTrip() {
   resetOv();
@@ -40,7 +41,7 @@ function collect(f) {
 }
 
 function renderStep(f) {
-  document.getElementById('ovTitle').textContent = `Сгенерировать · ${f.step + 1}/${STEPS.length}`;
+  document.getElementById('ovTitle').textContent = `${TITLE} · ${f.step + 1}/${STEPS.length}`;
   const body = document.getElementById('ovBody');
 
   if (f.step === 0) {
