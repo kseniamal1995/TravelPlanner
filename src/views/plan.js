@@ -77,7 +77,7 @@ export function planHtml() {
       t += `<div class="daypart" style="--d:${d}ms"><span class="ln"></span><span class="tt">${ic(p.sect.ic || 'moon', 13)} ${esc(p.sect.t)}</span><span class="ln"></span></div>`;
       if (p.sect.note) t += `<div class="dpnote" style="--d:${d}ms">${esc(p.sect.note)}</div>`;
     }
-    t += stopHtml(p, c, d, i + 1);
+    t += stopHtml(p, c, d);
     if (p.leg && i < list.length - 1) t += `<div class="leg" style="--d:${Math.min(i + 1, 8) * 28}ms"><div class="ln"></div><span class="txt">${legHtml(p.leg, false)}</span></div>`;
   });
   const lastId = tabs.length ? tabs[tabs.length - 1].id : null;

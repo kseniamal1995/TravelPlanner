@@ -1,14 +1,15 @@
 /* ── Тост (undo) ── */
 #toast {
   position: fixed; left: 50%; bottom: 88px; transform: translate(-50%, 120px);
-  background: var(--ink); color: #fff; border-radius: 16px; padding: 11px 11px 11px 18px;
-  display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 14px;
+  width: calc(100% - 28px); max-width: 532px; box-sizing: border-box;
+  background: var(--ink); color: #fff; border-radius: 18px; padding: 11px 11px 11px 18px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 600; font-size: 14px;
   box-shadow: 0 10px 28px rgba(20,24,45,.22);
   transition: transform .35s cubic-bezier(.3,1.4,.4,1), opacity .25s;
-  opacity: 0; z-index: 50; max-width: min(92vw, 540px); pointer-events: none;
+  opacity: 0; z-index: 50; pointer-events: none;
 }
 #toast.on { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
 #toast button {
   background: rgba(255,255,255,.16); border: none; color: #fff; border-radius: 10px;
-  font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; padding: 9px 15px; white-space: nowrap;
+  font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer; padding: 9px 16px; white-space: nowrap; flex: 0 0 auto;
 }

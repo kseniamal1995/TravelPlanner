@@ -8,7 +8,7 @@ import { IDEAS } from '../config.js';
 import { placeBadge, placeBadgeId } from '../data/badges.js';
 import { store, openCards, imgCache, imgQueue } from '../store.js';
 
-export function stopHtml(p, c, dly, num) {
+export function stopHtml(p, c, dly) {
   const open = openCards.has(p.id);
 
   // иконки в мета-строке: предупреждение (крупнее) и заметка
@@ -31,7 +31,7 @@ export function stopHtml(p, c, dly, num) {
      класс done на карточке + кнопка
      `<button class="vbtn${p.done ? ' on' : ''}" data-act="visit" data-id="${p.id}" title="Был(а) здесь">${ic('check', 15)}</button>`
      и обработчик act === 'visit' в events.js. */
-  let h = `<div class="stop${open ? ' open' : ''}${p.id === store.flashId ? ' flash' : ''}" data-act="card" data-id="${p.id}"${dly != null ? ` style="--d:${dly}ms"` : ''}><div class="stophead"><div class="thumb" data-img="${p.id}">${num ? `<span class="pnum">${num}</span>` : ''}${im ? `<img src="${im}" alt="">` : `<img class="emoji" src="/emoji/${emoId}.png" alt="">`}</div><div class="nm"><div class="nmt">${esc(p.name)}</div>${meta}</div><div class="hright">${tkb}<span class="chev">${ic('chdn', 16)}</span></div></div>`;
+  let h = `<div class="stop${open ? ' open' : ''}${p.id === store.flashId ? ' flash' : ''}" data-act="card" data-id="${p.id}"${dly != null ? ` style="--d:${dly}ms"` : ''}><div class="stophead"><div class="thumb" data-img="${p.id}">${im ? `<img src="${im}" alt="">` : `<img class="emoji" src="/emoji/${emoId}.png" alt="">`}</div><div class="nm"><div class="nmt">${esc(p.name)}</div>${meta}</div><div class="hright">${tkb}<span class="chev">${ic('chdn', 16)}</span></div></div>`;
   h += `<div class="cbody"><div class="cbin">`;
   if (p.visit) h += `<div class="vtime">${ic('clock', 13)} ${esc(p.visit)}</div>`;
   if (p.booked) h += `<div class="booked">${ic('check', 13)} Забронировано${p.bt ? ' · ' + p.bt : ''}</div>`;

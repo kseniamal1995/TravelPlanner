@@ -37,12 +37,12 @@
   background: var(--acc-bg); color: var(--acc);
   font-weight: 700; font-size: 13px; padding: 9px 14px; border-radius: 999px;
 }
-/* погода — чип справа от кнопки маршрута */
+/* погода — без подложки, цветная emoji-иконка + температура */
 .wx {
-  display: inline-flex; align-items: center; gap: 5px; flex: 0 0 auto;
-  background: var(--pill-bg); color: var(--soft); font-weight: 700; font-size: 13px;
-  padding: 8px 12px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto;
+  color: var(--ink); font-weight: 700; font-size: 15px;
 }
+.wx .wxi { font-size: 19px; line-height: 1; }
 .wx:empty { display: none; }
 
 .actions { display: flex; gap: 8px; margin: 24px 2px; flex-wrap: wrap; }

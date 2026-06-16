@@ -1,10 +1,16 @@
 /* Погода через Open-Meteo, без ключей (см. docs/05-architecture.md).
    Горизонт прогноза ~16 дней; для более дальних дат слот скрыт. */
 import { wxCache } from '../store.js';
-import { ic } from '../icons.js';
 
-function wxIcon(code) {
-  return code <= 1 ? 'sun' : code <= 48 ? 'cloud' : 'rain';
+/** Цветная emoji-иконка погоды по weather_code Open-Meteo. */
+function wxEmoji(code) {
+  if (code <= 1) return '☀️';        // ясно
+  if (code <= 3) return '⛅';         // переменная облачность
+  if (code <= 48) return '☁️';        // облачно / туман
+  if (code <= 67 || (code >= 80 && code <= 82)) return '🌧️'; // дождь / ливень
+  if (code <= 77 || (code >= 85 && code <= 86)) return '🌨️'; // снег
+  if (code >= 95) return '⛈️';        // гроза
+  return '🌧️';
 }
 
 /** Пропатчить узлы [data-wxd="YYYY-MM-DD"] значениями из кэша. */
@@ -13,7 +19,7 @@ export function applyWx(c) {
   if (!by || by === 'loading') return;
   document.querySelectorAll('[data-wxd]').forEach((n) => {
     const w = by[n.dataset.wxd];
-    if (w && w.t != null) n.innerHTML = ic(wxIcon(w.c), 13) + ' ' + w.t + '°';
+    if (w && w.t != null) n.innerHTML = '<span class="wxi">' + wxEmoji(w.c) + '</span> ' + w.t + '°';
   });
 }
 
