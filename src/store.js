@@ -14,6 +14,7 @@ export const store = {
   remTab: 'all',       // активный таб напоминаний: 'all' | cityId
   undoSnap: null,      // снапшот для undo
   generating: false,   // идёт генерация маршрута (блокирует закрытие шита)
+  pendingTrip: null,   // { city, input, error } — плашка-заглушка генерируемой поездки
   animPending: false,  // ставить ли класс .anim при следующем рендере
   flashId: null,       // id только что добавленного места (вспышка)
 };

@@ -6,6 +6,7 @@ import { initState, store } from './store.js';
 import { render } from './render.js';
 import { registerEvents } from './events.js';
 import { registerDrag } from './ui/drag.js';
+import { registerSwipe } from './ui/swipe.js';
 import { tg } from './services/telegram.js';
 import { closeOv } from './ui/sheet.js';
 import { undoLast } from './ui/toast.js';
@@ -15,7 +16,7 @@ import { goHome, openTrip2, goRem, setRemTab, dismissIdeasHint, setTab, setIdeas
 import { openAdd } from './sheets/addPlace.js';
 import { openRem } from './sheets/reminder.js';
 import { newTrip } from './sheets/newTrip.js';
-import { generateTrip } from './sheets/generateTrip.js';
+import { generateTrip, retryPending } from './sheets/generateTrip.js';
 import { openArrival } from './sheets/arrival.js';
 import { openDeparture } from './sheets/departure.js';
 
@@ -23,13 +24,14 @@ import { openDeparture } from './sheets/departure.js';
 Object.assign(window, {
   closeOv, undoLast,
   goHome, openTrip2, goRem, setRemTab, dismissIdeasHint, setTab, setIdeas, goView, addDay, delDay,
-  openAdd, openRem, newTrip, generateTrip, openArrival, openDeparture,
+  openAdd, openRem, newTrip, generateTrip, retryPending, openArrival, openDeparture,
 });
 
 async function boot() {
   tg.init();
   registerEvents();
   registerDrag();
+  registerSwipe();
   // Закрытие шита по тапу на подложку.
   // Закрытие по тапу на подложку — но не во время генерации (чтобы случайно не прервать).
   document.getElementById('ov').addEventListener('click', (e) => { if (e.target.id === 'ov' && !store.generating) closeOv(); });

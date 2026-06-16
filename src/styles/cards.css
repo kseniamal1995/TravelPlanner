@@ -23,6 +23,15 @@
 .tripcard h3 { font-size: 20px; }
 .tripcard .meta { color: var(--soft); font-size: 13.5px; font-weight: 600; margin-top: 3px; }
 .tripcard .go { color: var(--soft2); display: flex; align-items: center; }
+/* плашка-заглушка генерируемой поездки */
+.tripcard.pending { cursor: default; position: relative; overflow: hidden; }
+.tripcard.pending::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(94, 92, 230, .10), transparent);
+  transform: translateX(-100%); animation: shimmer 1.5s infinite;
+}
+.tripcard.pending.err::after { content: none; }
+@keyframes shimmer { to { transform: translateX(100%); } }
 
 /* блок прибытия */
 .flow { border-radius: 20px; padding: 14px; margin: 12px 0; }
@@ -197,10 +206,17 @@
 .dpnote { font-size: 12.5px; color: var(--soft); font-weight: 600; margin: 4px 2px 12px; background: var(--gray-bg); border-radius: 11px; padding: 9px 12px; }
 
 /* напоминания */
-.rcard {
-  border-radius: 18px; padding: 13px 14px; margin: 10px 0;
-  display: flex; gap: 4px; align-items: flex-start;
+/* свайп-обёртка: под карточкой — красная зона удаления, карточка ездит по X */
+.rswipe { position: relative; margin: 10px 0; touch-action: pan-y; }
+.rdel {
+  position: absolute; inset: 0; background: var(--red); border-radius: 18px;
+  display: flex; align-items: center; justify-content: flex-end; padding-right: 22px; color: #fff;
 }
+.rcard {
+  position: relative; z-index: 1; border-radius: 18px; padding: 13px 14px; margin: 0;
+  display: flex; gap: 4px; align-items: flex-start; transition: transform .25s ease;
+}
+.rcard.swiping { transition: none; }
 .rchk { flex: 0 0 auto; padding: 8px; margin: -6px 0 -8px -8px; cursor: pointer; display: flex; }
 .rchk input { width: 16px; height: 16px; margin-top: 3px; accent-color: var(--acc); border-radius: 5px; }
 .rcard .rt2 { font-weight: 700; font-size: 14px; }
@@ -209,10 +225,14 @@
 .due.over { background: var(--red-bg); color: var(--red); }
 .due.ok { background: var(--gray-bg); color: var(--soft); }
 .rcard .done { text-decoration: line-through; color: var(--soft); }
-.rmain { flex: 1; min-width: 0; }
+/* основной блок: текст + зафиксированный справа шеврон */
+.rmain { flex: 1; min-width: 0; display: flex; gap: 8px; align-items: flex-start; }
 .rmain.tappable { cursor: pointer; }
-.rt2 .chev { vertical-align: -3px; margin-left: 3px; display: inline-flex; }
-.rcard.open .rt2 .chev { transform: rotate(180deg); }
+.rbody { flex: 1; min-width: 0; }
+.rchev { flex: 0 0 auto; color: var(--soft2); margin-top: 1px; display: inline-flex; transition: transform .2s; }
+.rcard.open .rchev { transform: rotate(180deg); }
+/* «Открыть» — текстовая ссылка без подложки */
+.rlink { color: var(--blue); font-weight: 600; font-size: 12.5px; display: inline-flex; align-items: center; gap: 3px; }
 .rdet { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .25s ease; }
 .rcard.open .rdet { grid-template-rows: 1fr; }
 .rdet .cbin { overflow: hidden; min-height: 0; }

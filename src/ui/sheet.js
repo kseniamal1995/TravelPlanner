@@ -6,6 +6,8 @@ import { onSheetOpen, onSheetClose } from './tgChrome.js';
 export function resetOv() {
   const cancel = document.getElementById('ovCancel');
   cancel.style.display = '';
+  cancel.classList.remove('sq');           // снять «квадратную» модификацию формы генерации
+  cancel.parentElement.classList.remove('genfoot');
   cancel.textContent = 'Отмена';
   const sv = document.getElementById('ovSave');
   sv.style.display = '';

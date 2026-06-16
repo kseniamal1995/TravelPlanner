@@ -87,9 +87,12 @@ function renderStep(f) {
   // Чипсы интересов — тоггл по клику (не нативные инпуты).
   body.querySelectorAll('.chip').forEach((ch) => { ch.onclick = () => { ch.classList.toggle('on'); tg.haptic('light'); }; });
 
-  // Кнопки: Назад/Отмена слева, Далее/Сгенерировать справа.
+  // Футер: слева квадратная кнопка «назад», справа основная кнопка на всю ширину.
   const cancel = document.getElementById('ovCancel');
-  cancel.textContent = f.step === 0 ? 'Отмена' : 'Назад';
+  cancel.parentElement.classList.add('genfoot');
+  cancel.classList.add('sq');
+  cancel.innerHTML = ic('chevl', 18);
+  cancel.setAttribute('aria-label', f.step === 0 ? 'Отмена' : 'Назад');
   cancel.onclick = () => {
     if (f.step === 0) { closeOv(); return; }
     collect(f); f.step--; renderStep(f);
@@ -106,15 +109,8 @@ function renderStep(f) {
   };
 }
 
-async function submit(f) {
-  const sv = document.getElementById('ovSave');
-  const body = document.getElementById('ovBody');
-  store.generating = true;                 // блокирует закрытие шита по тапу на подложку
-  sv.disabled = true; sv.textContent = 'Генерирую…';
-  document.getElementById('ovCancel').style.display = 'none';
-  document.getElementById('ovCancel').onclick = null;
-  body.innerHTML = `<div class="genwait"><div class="genspin"></div><div class="hint">Собираю маршрут по дням — это займёт до минуты. Не закрывай окно.</div></div>`;
-
+/** Сбор входных данных формы и запуск генерации (закрывает форму, показывает плашку). */
+function submit(f) {
   const input = {
     city: f.city, tripStart: f.tripStart, days: daysBetween(f.tripStart, f.end),
     hotel: f.hotel, arrival: f.arrival, departure: f.departure, checkin: f.checkin, checkout: f.checkout,
@@ -123,27 +119,39 @@ async function submit(f) {
     mustSee: splitLines(f.mustSee),
     fixedEvents: splitLines(f.fixedEvents),
   };
+  closeOv();
+  runGenerate(input);
+}
 
+/** Генерация в фоне: закрытая форма → плашка-заглушка на главной → готовый маршрут. */
+export async function runGenerate(input) {
+  store.pendingTrip = { city: input.city, input };
+  store.view = 'home';
+  store.S.activeCity = null;
+  store.animPending = true;
+  render();
   try {
     const { city, mock } = await api.generate(input);
-    store.generating = false;
+    store.pendingTrip = null;
     store.S.cities[city.id] = city;
     store.S.activeCity = city.id;
     store.view = 'plan';
     await save();
     tg.haptic('success');
-    closeOv();
     store.animPending = true;
     render();
     if (mock) console.warn('Маршрут сгенерирован в MOCK-режиме (нет ANTHROPIC_API_KEY).');
   } catch (e) {
-    store.generating = false;
-    body.innerHTML = `<div class="hint">${esc(e.message)}</div>`;
-    const c = document.getElementById('ovCancel');
-    c.style.display = ''; c.textContent = 'Назад'; c.onclick = () => { f.step = STEPS.length - 1; renderStep(f); };
-    sv.disabled = false; sv.textContent = 'Повторить';
-    sv.onclick = () => submit(f);
+    store.pendingTrip = { city: input.city, input, error: true };
+    tg.haptic('error');
+    render();
+    console.warn('Генерация не удалась:', e.message);
   }
+}
+
+/** Повторить последнюю упавшую генерацию (кнопка на плашке-заглушке). */
+export function retryPending() {
+  if (store.pendingTrip && store.pendingTrip.input) runGenerate(store.pendingTrip.input);
 }
 
 function splitLines(s) {
