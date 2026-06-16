@@ -27,6 +27,7 @@ function move(e) {
     if (Math.abs(dx) <= Math.abs(dy) || Math.abs(dx) < 8) { if (Math.abs(dy) > 10) s = null; return; }
     s.active = true;
     s.card.classList.add('swiping');
+    s.card.parentElement.classList.add('swiping'); // .rswipe — показать красную зону
   }
   if (e.cancelable) e.preventDefault();
   s.dx = Math.min(0, dx); // только влево
@@ -41,6 +42,7 @@ function up() {
     if (s.dx < -THRESHOLD) { remove(s); s = null; return; }
     s.card.style.transform = '';
     s.card.classList.remove('swiping', 'willdel');
+    s.card.parentElement.classList.remove('swiping');
   }
   s = null;
 }

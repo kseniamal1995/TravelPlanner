@@ -211,7 +211,9 @@
 .rdel {
   position: absolute; inset: 0; background: var(--red); border-radius: 18px;
   display: flex; align-items: center; justify-content: flex-end; padding-right: 22px; color: #fff;
+  opacity: 0; /* скрыта, пока карточку не свайпают — иначе просвечивает при анимации появления */
 }
+.rswipe.swiping .rdel { opacity: 1; }
 .rcard {
   position: relative; z-index: 1; border-radius: 18px; padding: 13px 14px; margin: 0;
   display: flex; gap: 4px; align-items: flex-start; transition: transform .25s ease;
