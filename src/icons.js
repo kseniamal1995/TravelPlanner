@@ -38,11 +38,17 @@ export const PATHS = {
   leaf: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>',
   camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
   dots: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+  // звезда с мягко скруглёнными вершинами (для рейтинга)
+  star: '<path d="M11.48 3.06a.58.58 0 0 1 1.04 0l2.3 4.9 5.18.66a.58.58 0 0 1 .32 1l-3.86 3.66 1.02 5.32a.58.58 0 0 1-.85.6L12 16.5l-4.63 2.7a.58.58 0 0 1-.85-.6l1.02-5.32L3.68 9.62a.58.58 0 0 1 .32-1l5.18-.66Z"/>',
 };
 
 /** Отрендерить иконку по имени из словаря PATHS. */
 export const ic = (n, s = 18) =>
   `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="i">${PATHS[n] || ''}</svg>`;
+
+/** Залитая звезда рейтинга (мягкие углы, цвет — currentColor). */
+export const STAR = (s = 13) =>
+  `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" class="i star">${PATHS.star}</svg>`;
 
 // Часто используемые иконки фиксированного размера.
 export const EXT = ic('ext', 12);

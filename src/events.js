@@ -25,6 +25,11 @@ function onClick(e) {
     t.closest('.rcard').classList.toggle('open');
     return;
   }
+  // раскрытие подробностей стартового перегона
+  if (act === 'legmore') {
+    t.classList.toggle('open');
+    return;
+  }
   // редактор места
   if (act === 'toggle') {
     const eb = t.closest('.stop').querySelector('.editbody');

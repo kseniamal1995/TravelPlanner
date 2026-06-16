@@ -4,9 +4,9 @@
 .notepill, .dpnote, .pick, .due.ok { font-weight: 500; }
 .kicker, .leg, .mv, .rcard .rt2, .rcity, .chip, .tab .s, .tk,
 .cmeta .rt, .daypart .tt, .modal label, #toast,
-.nmt, .inforow-tt { font-weight: 600; }
+.nmt, .inforow-tt, .editbtn { font-weight: 600; }
 .booked, .flow .tt, .disc summary, .disc .body b,
-.tk .lead b, .editbtn, .bottomrow a, .btn, .bigbtn, .iconbtn, .tab .d,
+.tk .lead b, .bottomrow a, .btn, .bigbtn, .iconbtn, .tab .d,
 .subtab, .due, .back, .bnav button, .sheetbtn, .tkbtn,
 #toast button, .empty .big { font-weight: 700; }
 

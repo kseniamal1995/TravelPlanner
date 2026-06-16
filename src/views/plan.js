@@ -51,8 +51,16 @@ export function planHtml() {
 
   if (isArr) t += arrivalRow(c);
   // пилюля «Старт» — только при нестандартном старте дня
-  if (dayObj && dayObj.first) t += `<div class="leg startleg"><span class="txt">${ic('bed', 14)} Старт · ${legHtml(dayObj.first, true)}</span></div>`;
-  else if (!c.hotel) t += `<div class="leg startleg hotelhint" onclick="openArrival()"><span class="txt">${ic('bed', 14)} Добавьте отель — покажем путь до старта</span></div>`;
+  if (dayObj && dayObj.first) {
+    const fl = dayObj.first;
+    const canMore = !!fl.to;
+    t += `<div class="startwrap${canMore ? ' canmore' : ''}"${canMore ? ' data-act="legmore" data-id="start"' : ''}>`
+      + `<div class="leg startleg"><span class="txt">${ic('bed', 14)} Старт · ${legHtml(fl, false)}${canMore ? `<span class="chev">${ic('chdn', 14)}</span>` : ''}</span></div>`
+      + (canMore ? `<div class="legdet">${esc(fl.to)}</div>` : '')
+      + `</div>`;
+  } else if (!c.hotel) {
+    t += `<div class="leg startleg hotelhint" onclick="openArrival()"><span class="txt">${ic('bed', 14)} Добавьте отель — покажем путь до старта</span></div>`;
+  }
 
   const delBtn = tabs.length > 1 ? `<button class="ghostbtn danger" onclick="delDay('${c.activeTab}')">${ic('trash', 13)} Удалить день</button>` : '';
   const list = c.places.filter((p) => p.bucket === c.activeTab).sort((a, b) => a.order - b.order);

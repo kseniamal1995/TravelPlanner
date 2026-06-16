@@ -2,7 +2,7 @@
    Свёрнутая = «что это + статус»: название, фото, категория, рейтинг, иконки
    предупреждения/заметки; справа по центру — бейдж билета и шеврон раскрытия.
    Текстовые детали — только в раскрывашке. */
-import { ic, EXT, PEN, TRASH } from '../icons.js';
+import { ic, STAR, EXT, PEN, TRASH } from '../icons.js';
 import { esc, dayLabel } from '../lib/format.js';
 import { IDEAS } from '../config.js';
 import { placeBadge, placeBadgeId } from '../data/badges.js';
@@ -13,8 +13,8 @@ export function stopHtml(p, c, dly) {
 
   // иконки в мета-строке: предупреждение (крупнее) и заметка
   const mics = [];
-  if (p.warnS) mics.push(`<span class="mic alert" title="Предупреждение">${ic('warn', 15)}</span>`);
-  if (p.userNote) mics.push(`<span class="mic" title="Есть заметка">${ic('note', 13)}</span>`);
+  if (p.warnS) mics.push(`<span class="mic alert" title="Предупреждение">${ic('warn', 16)}</span>`);
+  if (p.userNote) mics.push(`<span class="mic" title="Есть заметка">${ic('note', 14)}</span>`);
 
   // бейдж билета — справа, рядом с шевроном; скрыт, если решили идти без билета
   let tkb = '';
@@ -25,7 +25,7 @@ export function stopHtml(p, c, dly) {
   const emoId = placeBadgeId(p);
   const im = imgCache[p.id];
   const b = placeBadge(p);
-  const meta = `<div class="cmeta"><span class="badge">${ic(b.icon, 12)} ${b.label}</span>${p.rating ? `<span class="rt">★ ${p.rating}</span>` : ''}${mics.join('')}</div>`;
+  const meta = `<div class="cmeta"><span class="badge">${ic(b.icon, 13)} ${b.label}</span>${p.rating ? `<span class="rt">${STAR(13)} ${p.rating}</span>` : ''}${mics.join('')}</div>`;
 
   /* Чек «посещено» отключён (фидбек итерации 6) — наработка сохранена:
      класс done на карточке + кнопка
@@ -36,8 +36,8 @@ export function stopHtml(p, c, dly) {
   if (p.visit) h += `<div class="vtime">${ic('clock', 13)} ${esc(p.visit)}</div>`;
   if (p.booked) h += `<div class="booked">${ic('check', 13)} Забронировано${p.bt ? ' · ' + p.bt : ''}</div>`;
   if (p.desc) h += `<div class="desc">${esc(stripUrl(p.desc))}</div>`;
-  if (p.warnH) h += `<div class="warn warn-h">${ic('clock', 15)} <div>${esc(stripUrl(p.warnH))}</div></div>`;
-  if (p.warnS) h += `<div class="warn warn-s">${ic('warn', 15)} <div>${esc(stripUrl(p.warnS))}</div></div>`;
+  if (p.warnH) h += `<div class="warn warn-h">${ic('clock', 17)} <div>${esc(stripUrl(p.warnH))}</div></div>`;
+  if (p.warnS) h += `<div class="warn warn-s">${ic('warn', 17)} <div>${esc(stripUrl(p.warnS))}</div></div>`;
   if (p.ticket || p.bought) {
     // чекбокс-тоггл «Билет есть»
     const have = (on) => `<button class="tkhave${on ? ' on' : ''}" data-act="buy" data-id="${p.id}"><span class="box">${on ? ic('check', 13) : ''}</span> Билет есть</button>`;
