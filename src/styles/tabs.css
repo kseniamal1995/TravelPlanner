@@ -30,20 +30,21 @@
   flex: 0 0 auto; min-width: 48px; color: var(--soft); padding: 8px 12px;
 }
 
+/* под-вкладки (идеи / напоминания) — в одном стиле с табами дней:
+   скруглённый прямоугольник, серый неактивный, лавандовый + индиго активный */
 .subtabs { display: flex; gap: 7px; margin: 12px 2px; }
 .subtab {
-  background: var(--pill-bg); border-radius: 999px; padding: 11px 17px;
+  background: var(--pill-bg); border-radius: 15px; padding: 10px 16px;
   font-weight: 700; font-size: 13px; color: var(--soft); cursor: pointer;
   display: inline-flex; align-items: center; gap: 6px;
 }
-.subtab.on { background: var(--acc); color: #fff; }
+.subtab.on { background: var(--acc-bg); color: var(--acc); }
 /* таб-ряд напоминаний скроллится, если поездок много */
 .rtabs { overflow-x: auto; flex-wrap: nowrap; -ms-overflow-style: none; scrollbar-width: none; }
 .rtabs::-webkit-scrollbar { display: none; }
 .rtabs .subtab { flex: 0 0 auto; }
 /* точка «есть горящее напоминание» на табе */
 .subtab .rbadge { width: 7px; height: 7px; border-radius: 50%; background: var(--red); display: inline-block; }
-.subtab.on .rbadge { background: #fff; }
 
 /* точки нагрузки дня */
 .idot { width: 9px; height: 9px; border-radius: 50%; display: block; margin: 4px auto 0; }

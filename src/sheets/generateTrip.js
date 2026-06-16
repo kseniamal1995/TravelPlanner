@@ -124,14 +124,12 @@ async function submit(f) {
     fixedEvents: splitLines(f.fixedEvents),
   };
 
-  const firstTrip = Object.keys(store.S.cities).length === 0; // первая поездка пользователя
   try {
     const { city, mock } = await api.generate(input);
     store.generating = false;
     store.S.cities[city.id] = city;
     store.S.activeCity = city.id;
     store.view = 'plan';
-    if (firstTrip) store.S.ideasHint = true; // онбординг «Идеи» после первой генерации
     await save();
     tg.haptic('success');
     closeOv();

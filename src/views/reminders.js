@@ -29,7 +29,7 @@ export function remHtml() {
   cities.forEach((c) => { (c.reminders || []).forEach((r) => items.push({ ...r, city: c.name, cid: c.id })); });
   items.sort((a, b) => (a.due || '9999').localeCompare(b.due || '9999'));
 
-  let t = `<div class="pbar"><button class="back" onclick="goHome()">${ic('chevl', 15)} Поездки</button><div class="ptitle"><h1>Напоминания</h1></div></div>`;
+  let t = `<div class="pbar"><button class="back" onclick="goHome()">${ic('chevl', 15)} Поездки</button><div class="ptitle"><h1>Напоминания</h1></div><div class="psub">Дедлайны по поездке — мы добавляем их сами и вы можете вручную.</div></div>`;
 
   // Табы — только если поездок больше одной.
   if (multi) {
