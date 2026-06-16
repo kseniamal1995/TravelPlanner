@@ -45,8 +45,11 @@ export function planHtml() {
       wxs = `<span class="wx" data-wxd="${dt.toISOString().slice(0, 10)}"></span>`;
     }
     const cnt = `${inten.stops} ${plural(inten.stops, ['место', 'места', 'мест'])}`;
-    const meta = `<span class="dl-meta">${wxs}<i class="dl-dot lv-${inten.level}"></i>${inten.label} · ${cnt}</span>`;
-    t += `<div class="dayline">${ru ? `<a class="dl-route" href="${ru}" target="_blank" rel="noopener">${ic('route', 15)} Маршрут в Google Maps ${EXT}</a>` : ''}${meta}</div>`;
+    // строка 1: маршрут (слева) + погода (справа); строка 2: нагрузка дня
+    t += `<div class="dayhdr">`
+      + `<div class="dayhdr-top">${ru ? `<a class="dl-route" href="${ru}" target="_blank" rel="noopener">${ic('route', 15)} Маршрут в Google Maps ${EXT}</a>` : '<span></span>'}${wxs}</div>`
+      + `<div class="dl-meta"><i class="dl-dot lv-${inten.level}"></i>${inten.label} · ${cnt}</div>`
+      + `</div>`;
   }
 
   if (isArr) t += arrivalRow(c);
@@ -74,7 +77,7 @@ export function planHtml() {
       t += `<div class="daypart" style="--d:${d}ms"><span class="ln"></span><span class="tt">${ic(p.sect.ic || 'moon', 13)} ${esc(p.sect.t)}</span><span class="ln"></span></div>`;
       if (p.sect.note) t += `<div class="dpnote" style="--d:${d}ms">${esc(p.sect.note)}</div>`;
     }
-    t += stopHtml(p, c, d);
+    t += stopHtml(p, c, d, i + 1);
     if (p.leg && i < list.length - 1) t += `<div class="leg" style="--d:${Math.min(i + 1, 8) * 28}ms"><div class="ln"></div><span class="txt">${legHtml(p.leg, false)}</span></div>`;
   });
   const lastId = tabs.length ? tabs[tabs.length - 1].id : null;

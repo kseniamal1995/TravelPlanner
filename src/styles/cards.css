@@ -77,16 +77,18 @@
 .startleg .txt { color: var(--soft); }
 
 /* строка-подложка (прибытие/заселение) — кликабельна, открывает модалку */
+/* логистика (прибытие/отъезд/отель) — тонированная плашка, отличается от белых карточек мест */
 .inforow {
   width: 100%; display: flex; align-items: center; gap: 12px; margin: 14px 0;
-  background: #fff; border: none; border-radius: 16px; padding: 11px 14px;
+  background: var(--pill-bg); border: none; border-radius: 16px; padding: 11px 14px;
   cursor: pointer; font-family: inherit; text-align: left;
 }
 /* иконка — того же размера, что превью у карточек мест (.thumb) */
 .inforow-ic {
-  width: 48px; height: 48px; border-radius: 14px; background: var(--gray-bg);
+  width: 48px; height: 48px; border-radius: 14px; background: #fff;
   display: flex; align-items: center; justify-content: center; flex: 0 0 auto; overflow: hidden;
 }
+.inforow-chip { background: #fff; }
 .inforow-ic img { width: 72%; height: 72%; object-fit: contain; }
 .inforow-tt { flex: 1; min-width: 0; font-weight: 600; font-size: 15px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .inforow-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--gray-bg); color: var(--soft); font-weight: 700; font-size: 12.5px; padding: 5px 10px; border-radius: 999px; flex: 0 0 auto; }
@@ -176,9 +178,17 @@
 
 /* фото локаций; превью также служит ручкой перетаскивания (ui/drag.js) */
 .thumb {
+  position: relative;
   width: 48px; height: 48px; border-radius: 14px; background: var(--gray-bg); color: var(--soft);
   display: flex; align-items: center; justify-content: center; flex: 0 0 auto; overflow: hidden;
   touch-action: none; cursor: grab;
+}
+/* номер места в дне (угловой бейдж на превью) */
+.thumb .pnum {
+  position: absolute; top: 0; left: 0; z-index: 1;
+  min-width: 20px; height: 20px; padding: 0 5px; box-sizing: border-box;
+  background: rgba(28, 30, 38, .62); color: #fff; font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; border-radius: 14px 0 10px 0;
 }
 
 /* перетаскивание карточки */
@@ -222,7 +232,7 @@
 .rchk { flex: 0 0 auto; padding: 8px; margin: -6px 0 -8px -8px; cursor: pointer; display: flex; }
 .rchk input { width: 16px; height: 16px; margin-top: 3px; accent-color: var(--acc); border-radius: 5px; }
 .rcard .rt2 { font-weight: 700; font-size: 14px; }
-.rcard .due { font-size: 12px; font-weight: 700; margin-top: 3px; display: inline-block; padding: 2px 8px; border-radius: 8px; }
+.rcard .due { font-size: 12px; font-weight: 700; margin-top: 3px; display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 8px; }
 .due.soon { background: var(--amber-bg); color: var(--amber); }
 .due.over { background: var(--red-bg); color: var(--red); }
 .due.ok { background: var(--gray-bg); color: var(--soft); }

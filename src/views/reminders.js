@@ -47,6 +47,7 @@ export function remHtml() {
       if (du < 0) { cls = 'over'; txt = 'просрочено · ' + fmtDate(r.due); }
       else if (du <= 14) { cls = 'soon'; txt = (du === 0 ? 'сегодня' : 'через ' + du + ' ' + plural(du, ['день', 'дня', 'дней'])) + ' · ' + fmtDate(r.due); }
     }
+    const dueIc = cls === 'over' ? ic('warn', 13) : cls === 'soon' ? ic('clock', 13) : '';
     const sp = remSplit(r.text);
     const det = !!sp[1];
     const open = openRems.has(r.id);
@@ -58,7 +59,7 @@ export function remHtml() {
       + `<div class="rbody">`
       + `<div class="rt2 ${r.done ? 'done' : ''}">${esc(sp[0])}</div>`
       + (det ? `<div class="rdet"><div class="cbin"><div class="rdtext">${esc(sp[1])}</div></div></div>` : '')
-      + `<div class="rmeta">${all ? `<span class="rcity">${esc(r.city)}</span>` : ''}${txt ? `<span class="due ${cls}">${txt}</span>` : ''}${r.url ? `<a class="rlink" href="${r.url}" target="_blank" rel="noopener">Открыть ${EXT}</a>` : ''}</div>`
+      + `<div class="rmeta">${all ? `<span class="rcity">${esc(r.city)}</span>` : ''}${txt ? `<span class="due ${cls}">${dueIc}${txt}</span>` : ''}${r.url ? `<a class="rlink" href="${r.url}" target="_blank" rel="noopener">Открыть ${EXT}</a>` : ''}</div>`
       + `</div>`
       + (det ? `<span class="rchev">${CHDN}</span>` : '')
       + `</div></div></div>`;
