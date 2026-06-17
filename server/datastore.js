@@ -62,5 +62,10 @@ export async function initSchema() {
       updated_at ${TS} NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_place_city ON place(city_key);
+    CREATE TABLE IF NOT EXISTS city_image (
+      city_key   TEXT PRIMARY KEY,
+      url        TEXT NOT NULL,
+      updated_at ${TS} NOT NULL
+    );
   `);
 }

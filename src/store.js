@@ -24,9 +24,11 @@ export const openCards = new Set();
 export const openRems = new Set();
 
 // Кэши внешних данных.
-export const imgCache = {};   // id места → url фото | null
-export const wxCache = {};    // имя города → 'loading' | null | { date: {t, c} }
-export const imgQueue = [];    // очередь подгрузки фото (мутируется push/splice на месте)
+export const imgCache = {};       // id места → url фото | null
+export const cityImgCache = {};   // id города → url картинки | null
+export const wxCache = {};        // имя города → 'loading' | null | { date: {t, c} }
+export const imgQueue = [];        // очередь подгрузки фото мест (push/splice на месте)
+export const cityImgQueue = [];    // очередь подгрузки картинок городов
 
 /** Активный город. */
 export function city() {

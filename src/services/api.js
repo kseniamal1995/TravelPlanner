@@ -55,4 +55,11 @@ export const api = {
     if (!r.ok) throw new Error('Не удалось сгенерировать день (' + r.status + ')');
     return r.json();
   },
+
+  /** Картинка города (кэшируется на сервере). Возвращает URL или ''. */
+  async cityImage(city) {
+    const r = await fetch(`${BASE}/city-image?city=` + encodeURIComponent(city), { headers: headers() });
+    if (!r.ok) return '';
+    return (await r.json()).url || '';
+  },
 };

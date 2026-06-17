@@ -42,6 +42,20 @@ export async function setPlace(city, name, data) {
   );
 }
 
+/** Картинка города (URL) из кэша. undefined = не кэшировано; '' = кэшировано без картинки. */
+export async function getCityImage(city) {
+  const row = await ds.get('SELECT url FROM city_image WHERE city_key = ?', [keyOf(city)]);
+  return row ? row.url : undefined;
+}
+
+export async function setCityImage(city, url) {
+  await ds.run(
+    `INSERT INTO city_image (city_key, url, updated_at) VALUES (?, ?, ?)
+     ON CONFLICT(city_key) DO UPDATE SET url = excluded.url, updated_at = excluded.updated_at`,
+    [keyOf(city), url || '', Date.now()],
+  );
+}
+
 /** Все известные места города (для подмешивания в промпт генерации). */
 export async function getPlacesByCity(city) {
   const rows = await ds.all('SELECT name, data FROM place WHERE city_key = ?', [keyOf(city)]);
