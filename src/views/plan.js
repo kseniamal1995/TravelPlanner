@@ -36,6 +36,7 @@ export function planHtml() {
   const dayObj = tabs.find((d) => d.id === c.activeTab);
   const inten = intensity(c, c.activeTab);
   const ru = routeUrl(c, c.activeTab);
+  const list = c.places.filter((p) => p.bucket === c.activeTab).sort((a, b) => a.order - b.order);
   if (inten.stops) {
     let wxs = '';
     if (c.tripStart) {
@@ -53,20 +54,23 @@ export function planHtml() {
   }
 
   if (isArr) t += arrivalRow(c);
-  // пилюля «Старт» — только при нестандартном старте дня
+  // перегон до первой точки дня
   if (dayObj && dayObj.first) {
+    // готовые данные перегона (seed/ручной ввод): режим, время, куда — раскрывается
     const fl = dayObj.first;
     const canMore = !!fl.to;
     t += `<div class="startwrap${canMore ? ' canmore' : ''}"${canMore ? ' data-act="legmore" data-id="start"' : ''}>`
       + `<div class="leg startleg"><span class="txt">${ic('bed', 14)} Старт · ${legHtml(fl, false)}${canMore ? `<span class="chev">${ic('chdn', 14)}</span>` : ''}</span></div>`
       + (canMore ? `<div class="legdet">${esc(fl.to)}</div>` : '')
       + `</div>`;
-  } else if (!c.hotel) {
-    t += `<div class="leg startleg hotelhint" onclick="openArrival()"><span class="txt">${ic('bed', 14)} Добавьте отель — покажем путь до старта</span></div>`;
+  } else if (c.hotel && c.hotel.name && list.length) {
+    // реальная ссылка «от отеля до первой точки» (origin = отель)
+    const dst = list[0].rname || (list[0].name + ', ' + c.name);
+    const url = 'https://www.google.com/maps/dir/?api=1&travelmode=walking&origin=' + encodeURIComponent(c.hotel.name + ' ' + c.name) + '&destination=' + encodeURIComponent(dst);
+    t += `<a class="leg startleg startlink" href="${url}" target="_blank" rel="noopener"><span class="txt">${ic('bed', 14)} От отеля до «${esc(list[0].name)}» ${EXT}</span></a>`;
   }
 
   const delBtn = tabs.length > 1 ? `<button class="ghostbtn danger" onclick="delDay('${c.activeTab}')">${ic('trash', 13)} Удалить день</button>` : '';
-  const list = c.places.filter((p) => p.bucket === c.activeTab).sort((a, b) => a.order - b.order);
   if (!list.length) {
     t += emptyHtml('sparkles', 'День пока пуст', 'Добавь места вручную — или перенеси из идей');
     t += `<div class="emptyact"><button class="btn acc" onclick="openAdd()">${ic('plus', 15)} Добавить место</button>${delBtn}</div>`;
