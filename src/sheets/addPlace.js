@@ -7,6 +7,8 @@ import { store, city, save } from '../store.js';
 import { render } from '../render.js';
 import { resetOv, openOv, closeOv } from '../ui/sheet.js';
 import { showToast } from '../ui/toast.js';
+import { openImport } from './importPlaces.js';
+import { ic } from '../icons.js';
 
 export function openAdd() {
   resetOv();
@@ -16,7 +18,9 @@ export function openAdd() {
   const opts = tabs.map((t) => `<option value="${t.id}" ${t.id === cur ? 'selected' : ''}>${t.d}</option>`).join('');
   document.getElementById('ovTitle').textContent = 'Добавить место';
 
-  let body = `<label>Название</label><input id="f_name" placeholder="напр. Centre Pompidou"><label>Ссылка</label><input id="f_link" placeholder="вставь ссылку"><label>Куда</label><select id="f_bucket">${opts}</select>`;
+  let body = `<button type="button" class="btn impfind" id="f_import">${ic('pin', 15)} Импорт из Google Maps</button>`
+    + `<div class="orsep"><span>или вручную</span></div>`
+    + `<label>Название</label><input id="f_name" placeholder="напр. Centre Pompidou"><label>Ссылка</label><input id="f_link" placeholder="вставь ссылку"><label>Куда</label><select id="f_bucket">${opts}</select>`;
   // отложенные места из идей — можно забрать чек-листом
   const stash = c.places.filter((p) => ['shop', 'food', 'later'].includes(p.bucket) && p.bucket !== cur)
     .sort((a, b) => a.bucket.localeCompare(b.bucket) || a.order - b.order);
@@ -26,6 +30,7 @@ export function openAdd() {
       + `</div>`;
   }
   document.getElementById('ovBody').innerHTML = body;
+  document.getElementById('f_import').onclick = () => openImport();
 
   document.getElementById('ovSave').onclick = () => {
     const name = document.getElementById('f_name').value.trim();

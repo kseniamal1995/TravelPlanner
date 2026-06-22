@@ -63,6 +63,28 @@ export const api = {
     return r.json();
   },
 
+  /** Импорт мест из Google Maps по ссылке. Возвращает { found, places:[{name,lat,lng,gmaps}] }. */
+  async importLink(url) {
+    const r = await fetch(`${BASE}/import/link`, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({ url }),
+    });
+    if (!r.ok) return { found: false, places: [] };
+    return r.json();
+  },
+
+  /** Импорт мест из скриншота Google Maps. image — data-URL. Возвращает { found, places, engine }. */
+  async importScreenshot(image) {
+    const r = await fetch(`${BASE}/import/screenshot`, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({ image }),
+    });
+    if (!r.ok) return { found: false, places: [] };
+    return r.json();
+  },
+
   /** Картинка города (кэшируется на сервере). Возвращает URL или ''. */
   async cityImage(city) {
     const r = await fetch(`${BASE}/city-image?city=` + encodeURIComponent(city), { headers: headers() });

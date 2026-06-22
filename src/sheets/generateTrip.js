@@ -9,15 +9,16 @@ import { render } from '../render.js';
 import { resetOv, openOv, closeOv } from '../ui/sheet.js';
 import { api } from '../services/api.js';
 import { tg } from '../services/telegram.js';
+import { mountImportPanel, newImportState, selectedPlaces, placeFromImport } from './importPlaces.js';
 
 const PACE = [['low', 'Спокойный'], ['med', 'Средний'], ['high', 'Активный']];
-const STEPS = ['Город и даты', 'Перелёт', 'Отель', 'Темп', 'Интересы', 'Мероприятия'];
+const STEPS = ['Город и даты', 'Перелёт', 'Отель', 'Темп', 'Интересы', 'Свои места', 'Мероприятия'];
 const TITLE = 'Новая поездка';
 
 export function generateTrip() {
   resetOv();
-  // Состояние формы переживает перерисовку шагов.
-  const f = { step: 0, city: '', tripStart: '', end: '', hotel: '', arrival: '', departure: '', arrivalFlight: '', departureFlight: '', arrivalAirport: '', departureAirport: '', flightManual: false, checkin: '', checkout: '', pace: 'med', interests: [], mustSee: '', fixedEvents: '' };
+  // Состояние формы переживает перерисовку шагов (вкл. панель импорта).
+  const f = { step: 0, city: '', tripStart: '', end: '', hotel: '', arrival: '', departure: '', arrivalFlight: '', departureFlight: '', arrivalAirport: '', departureAirport: '', flightManual: false, checkin: '', checkout: '', pace: 'med', interests: [], mustSee: '', fixedEvents: '', importState: newImportState() };
   document.getElementById('ov').classList.add('fullsheet');  // форма создания — на весь экран
   renderStep(f);
   openOv();
@@ -48,8 +49,10 @@ function collect(f) {
     if (checked) f.pace = checked.value;
   } else if (f.step === 4) {
     f.interests = [...document.querySelectorAll('#ovBody .chip.on')].map((x) => x.dataset.v);
-    f.mustSee = v('g_must') ?? f.mustSee;
   } else if (f.step === 5) {
+    // Шаг «Свои места»: выбор хранится в f.importState (панель), отдельный collect не нужен.
+  } else if (f.step === 6) {
+    f.mustSee = v('g_must') ?? f.mustSee;
     f.fixedEvents = v('g_events') ?? f.fixedEvents;
   }
 }
@@ -98,9 +101,15 @@ function renderStep(f) {
   } else if (f.step === 4) {
     html = `<label>Интересы</label><div class="chips">`
       + DAY_THEMES.map(([, t, icon]) => `<button type="button" class="chip${f.interests.includes(t) ? ' on' : ''}" data-v="${esc(t)}">${ic(icon, 15)} ${t}</button>`).join('')
-      + `</div><label>Обязательно увидеть</label><textarea id="g_must" rows="3" placeholder="Например:&#10;Эйфелева башня&#10;Лувр">${esc(f.mustSee)}</textarea>`;
+      + `</div>`;
   } else if (f.step === 5) {
-    html = `<label>Забронированные мероприятия</label>`
+    html = `<label>Свои места из Google Maps <span class="opt">необязательно</span></label>`
+      + `<div class="hint" style="margin:0 0 6px">Вставь ссылку или загрузи скриншот подборки. Места в городе станут точками маршрута, далёкие уйдут в «Идеи».</div>`
+      + `<div id="g_importpanel"></div>`;
+  } else if (f.step === 6) {
+    html = `<label>Обязательно увидеть</label>`
+      + `<textarea id="g_must" rows="3" placeholder="Например:&#10;Колизей&#10;Ватикан">${esc(f.mustSee)}</textarea>`
+      + `<label>Забронированные мероприятия</label>`
       + `<textarea id="g_events" rows="4" placeholder="Необязательно">${esc(f.fixedEvents)}</textarea>`
       + `<div class="hint">Напишите мероприятия, на которые у вас уже куплены билеты. Приложение учтёт их при составлении поездки.</div>`;
   }
@@ -117,6 +126,12 @@ function renderStep(f) {
     if (man) man.onclick = () => { if (f.flightManual) return; collect(f); f.flightManual = true; tg.haptic('light'); renderStep(f); };
     wireFlight(f, 'g_arrflight', 'g_arrinfo', 'arr');
     wireFlight(f, 'g_depflight', 'g_depinfo', 'dep');
+  }
+
+  // Шаг «Свои места»: панель импорта прямо в форме (та же панель, что и в готовой поездке).
+  if (f.step === 5) {
+    const host = document.getElementById('g_importpanel');
+    if (host) mountImportPanel(host, f.importState, () => f.city, null);
   }
 
   // Футер: слева квадратная кнопка «назад», справа основная кнопка на всю ширину.
@@ -143,6 +158,10 @@ function renderStep(f) {
 
 /** Сбор входных данных формы и запуск генерации (закрывает форму, показывает плашку). */
 function submit(f) {
+  // Импортированные места: близкие → must-see (AI строит вокруг них), далёкие → «Идеи» после генерации.
+  const imported = selectedPlaces(f.importState, f.city);
+  const nearNames = imported.filter((p) => p.near).map((p) => p.name);
+  const farPlaces = imported.filter((p) => !p.near);
   const input = {
     city: f.city, tripStart: f.tripStart, days: daysBetween(f.tripStart, f.end),
     hotel: f.hotel, arrival: f.arrival, departure: f.departure, checkin: f.checkin, checkout: f.checkout,
@@ -150,8 +169,9 @@ function submit(f) {
     arrivalAirport: f.arrivalAirport, departureAirport: f.departureAirport,
     pace: f.pace,
     interests: f.interests,
-    mustSee: splitLines(f.mustSee),
+    mustSee: [...splitLines(f.mustSee), ...nearNames],
     fixedEvents: splitLines(f.fixedEvents),
+    _farIdeas: farPlaces, // клиентское поле: сервер игнорирует, добавим в «Идеи» после генерации
   };
   closeOv();
   runGenerate(input);
@@ -167,6 +187,12 @@ export async function runGenerate(input) {
   try {
     const { city, mock } = await api.generate(input);
     store.pendingTrip = null;
+    // Далёкие импортированные места → в «Идеи → На потом» готовой поездки.
+    if (input._farIdeas && input._farIdeas.length) {
+      city.places = city.places || [];
+      let order = Math.max(0, ...city.places.filter((x) => x.bucket === 'later').map((x) => x.order + 1), 0);
+      for (const p of input._farIdeas) city.places.push(placeFromImport(p, city.name || input.city, order++));
+    }
     store.S.cities[city.id] = city;
     store.S.activeCity = city.id;
     store.view = 'plan';

@@ -69,6 +69,15 @@
   color: var(--soft); padding: 9px 6px; border-radius: 9px; cursor: pointer; transition: background .15s, color .15s;
 }
 .modeseg button.on { background: #fff; color: var(--acc); box-shadow: 0 1px 3px rgba(20,22,30,.12); }
+/* импорт мест: кнопки на всю ширину, разделитель «или», бейджи близко/далеко */
+.modal .impfind { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 50px; margin-top: 14px; }
+.orsep { display: flex; align-items: center; gap: 12px; margin: 16px 0 4px; color: var(--soft); font-size: 12px; font-weight: 600; }
+.orsep::before, .orsep::after { content: ""; flex: 1; height: 1px; background: var(--line2); }
+.improw { justify-content: flex-start; }
+.improw .impname { flex: 1; min-width: 0; }
+.impbadge { flex: 0 0 auto; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 999px; }
+.impbadge.near { color: var(--acc); background: var(--acc-bg); }
+.impbadge.far { color: var(--soft); background: var(--bg); }
 /* состояние генерации маршрута */
 .genwait { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 22px 0 6px; text-align: center; }
 .genwait .hint { margin-top: 0; max-width: 320px; }
