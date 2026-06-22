@@ -1,14 +1,11 @@
 /* ── Шкала весов: 400 текст · 500 мета и бейджи · 600 чипы и лейблы · 700 названия и CTA · 800 display ── */
-.desc, .disc .body, .tk .lead, .rdtext, .empty { font-weight: 400; }
-.badge, .dl-meta, .psub, .tripcard .meta, .warn, .flow .ss,
+.desc, .tk .lead, .rdtext, .empty { font-weight: 400; }
+.badge, .dl-meta, .psub, .tripcard .meta, .warn,
 .notepill, .dpnote, .pick, .due.ok { font-weight: 500; }
 .kicker, .leg, .mv, .rcard .rt2, .rcity, .chip, .tab .s, .tk,
 .cmeta .rt, .daypart .tt, .modal label, #toast,
 .nmt, .inforow-tt, .editbtn { font-weight: 600; }
-.booked, .flow .tt, .disc summary, .disc .body b,
+.booked,
 .tk .lead b, .bottomrow a, .btn, .bigbtn, .iconbtn, .tab .d,
 .subtab, .due, .back, .bnav button, .sheetbtn, .tkbtn,
 #toast button, .empty .big { font-weight: 700; }
-
-/* ссылки-кнопки — без подчёркивания */
-.flow a, .disc summary { color: var(--blue); text-decoration: none; }

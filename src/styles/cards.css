@@ -10,7 +10,7 @@
 .ideahint-x { margin-left: auto; background: none; border: none; color: var(--soft); font-size: 15px; line-height: 1; cursor: pointer; flex: 0 0 auto; padding: 2px 2px; }
 
 /* Общая поверхность карточек: без рамок, белое на тонированном фоне, без тени. */
-.tripcard, .flow, .stop, .rcard {
+.tripcard, .stop, .rcard {
   background: #fff;
   border: none;
 }
@@ -35,31 +35,6 @@
 .tripcard.pending.err::after { content: none; }
 @keyframes shimmer { to { transform: translateX(100%); } }
 
-/* блок прибытия */
-.flow { border-radius: 20px; padding: 14px; margin: 12px 0; }
-.flow .ic { color: var(--acc); font-size: 18px; flex: 0 0 auto; line-height: 1.4; }
-.flow .step { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); }
-.flow .step:last-child { border-bottom: none; }
-.flow .tt { font-weight: 700; font-size: 14px; }
-.flow .ss { color: var(--soft); font-size: 12.5px; font-weight: 600; margin-top: 1px; }
-.flow a { color: var(--blue); font-weight: 800; }
-
-.disc summary {
-  cursor: pointer; font-weight: 800; color: var(--blue); font-size: 13px;
-  list-style: none; margin-top: 3px;
-}
-.disc summary::-webkit-details-marker { display: none; }
-.disc .body { margin-top: 6px; font-size: 13px; color: var(--ink); font-weight: 500; }
-.disc .body b { font-weight: 800; }
-
-.flowwrap { margin: 10px 0; }
-.flowwrap > summary {
-  cursor: pointer; list-style: none; font-weight: 800; font-size: 14px; color: var(--ink);
-  padding: 7px 2px; display: flex; align-items: center; gap: 6px;
-}
-.flowwrap > summary::-webkit-details-marker { display: none; }
-.flowwrap > summary .chev { margin-left: auto; color: var(--soft2); display: inline-flex; transition: transform .25s; }
-.flowwrap[open] > summary .chev { transform: rotate(180deg); }
 
 /* перегоны и «старт» */
 .leg {
@@ -67,7 +42,6 @@
   font-size: 12.5px; margin: 1px 2px; font-weight: 700;
 }
 .leg .ln { width: 2px; height: 15px; background: var(--line2); margin-left: 3px; border-radius: 2px; }
-.hotelhint { cursor: pointer; }
 /* ссылка «от отеля до первой точки» — перегон-пилюля с акцентным текстом */
 .startlink .txt { color: var(--acc); }
 /* раскрываемый стартовый перегон */
@@ -152,7 +126,6 @@
 .tk a { color: var(--blue); display: inline-flex; align-items: center; gap: 4px; }
 .tk .lead { font-weight: 500; color: var(--ink); font-size: 12.5px; width: 100%; margin-top: 2px; }
 .tk .lead b { font-weight: 800; }
-.tk .tkskip { display: inline-flex; align-items: center; gap: 5px; color: var(--soft); font-weight: 600; }
 
 /* текстовая кнопка-ссылка («Не покупать» / «Нужен билет» / «Удалить день») */
 .ghostbtn {
@@ -195,12 +168,6 @@
 .noselect, .noselect * { user-select: none; -webkit-user-select: none; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; animation: fadein .3s both; -webkit-user-drag: none; }
 .thumb img.emoji { width: 72%; height: 72%; object-fit: contain; }
-.pstack { display: flex; margin-top: 8px; }
-.pthumb {
-  width: 28px; height: 28px; border-radius: 50%; background: var(--acc-bg); color: var(--acc);
-  border: 2px solid #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-right: -9px;
-}
-.pthumb img { width: 100%; height: 100%; object-fit: cover; }
 
 /* состояние «посещено»: бледнеет/сереет, без зачёркивания */
 .stop.done .nmt { color: var(--soft2); }
