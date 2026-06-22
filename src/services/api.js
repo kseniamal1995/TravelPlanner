@@ -56,6 +56,13 @@ export const api = {
     return r.json();
   },
 
+  /** Поиск рейса по номеру и дате (YYYY-MM-DD). Возвращает { found, depAirport, depTime, arrAirport, arrTime }. */
+  async flight(no, date) {
+    const r = await fetch(`${BASE}/flight?no=` + encodeURIComponent(no) + '&date=' + encodeURIComponent(date), { headers: headers() });
+    if (!r.ok) return { found: false };
+    return r.json();
+  },
+
   /** Картинка города (кэшируется на сервере). Возвращает URL или ''. */
   async cityImage(city) {
     const r = await fetch(`${BASE}/city-image?city=` + encodeURIComponent(city), { headers: headers() });

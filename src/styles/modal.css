@@ -9,13 +9,42 @@
   padding: 24px 18px calc(28px + env(safe-area-inset-bottom)); max-height: 90vh; overflow: auto;
 }
 .modal::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--line2); margin: 0 auto 14px; }
+/* полноэкранный режим (форма «Новая поездка»): шит на всю высоту, тело прокручивается, футер прижат вниз */
+.ov.fullsheet { align-items: stretch; }
+.ov.fullsheet .modal {
+  max-width: none; height: 100dvh; max-height: 100dvh; border-radius: 0;
+  display: flex; flex-direction: column;
+  padding-top: max(20px, env(safe-area-inset-top));
+}
+.ov.fullsheet .modal::before { display: none; }
+.ov.fullsheet .modal { position: relative; }
+.ov.fullsheet #ovBody { flex: 1 1 auto; overflow: auto; min-height: 0; }
+.ov.fullsheet .row { margin-top: 18px; flex: 0 0 auto; }
+/* крестик закрытия (только в полноэкранном режиме формы) */
+.ovclose { display: none; }
+.ov.fullsheet .ovclose {
+  display: flex; align-items: center; justify-content: center;
+  position: absolute; top: max(18px, env(safe-area-inset-top)); right: 16px; z-index: 3;
+  width: 34px; height: 34px; padding: 0; border: none; border-radius: 50%;
+  background: var(--bg); color: var(--soft); font-size: 18px; line-height: 1; cursor: pointer;
+}
+.ov.fullsheet .ovclose:active { background: var(--line2); }
 .modal h3 { font-size: 20px; margin-bottom: 14px; }
 /* сегментный прогресс шагов формы (под заголовком) */
 .prog { display: flex; gap: 6px; margin: 4px 0 20px; }
 .prog .seg { flex: 1; height: 4px; border-radius: 2px; background: var(--line2); transition: background .25s; }
 .prog .seg.on { background: var(--acc); }
 /* отступ после прогресс-бара задаётся самим .prog — у первого элемента верхний отступ убираем */
-.prog + label, .prog + .arrblock { margin-top: 0; }
+.prog + label, .prog + .arrblock, .prog + .modeseg { margin-top: 0; }
+/* «необязательно» рядом с подписью поля */
+.modal label .opt { font-weight: 400; font-size: 11px; color: var(--soft); opacity: .7; margin-left: 5px; }
+/* секции шага «Перелёт» (Прилёт / Вылет) — без серой подложки, с воздухом */
+.fsec { margin-top: 26px; }
+.fsec-h { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; color: var(--ink); }
+.fsec-h img { width: 22px; height: 22px; object-fit: contain; flex: 0 0 auto; }
+.fsec > label:first-of-type { margin-top: 12px; }
+.fsec .two { margin-top: 12px; }
+.fsec .two label { margin-top: 0; }
 .modal label { display: block; font-size: 12px; font-weight: 600; color: var(--soft); margin: 18px 0 6px; }
 .modal input, .modal select, .modal textarea {
   width: 100%; border: 1.5px solid var(--line2); border-radius: 12px; padding: 12px;
@@ -29,6 +58,17 @@
   outline: none; border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-bg);
 }
 .modal .hint { font-size: 13px; color: var(--soft); font-weight: 400; line-height: 1.5; margin-top: 10px; }
+/* результат автозаполнения под полем номера рейса */
+.modal .ffinfo { font-size: 12.5px; color: var(--soft); font-weight: 500; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.modal .ffinfo.err { color: var(--red); }
+.modal .ffinfo:empty { display: none; }
+/* сегментный переключатель режима (по номеру рейса / вручную) */
+.modeseg { display: flex; gap: 4px; background: var(--line2); border-radius: 12px; padding: 4px; margin: 12px 0 2px; }
+.modeseg button {
+  flex: 1; border: none; background: none; font-family: inherit; font-weight: 700; font-size: 13px;
+  color: var(--soft); padding: 9px 6px; border-radius: 9px; cursor: pointer; transition: background .15s, color .15s;
+}
+.modeseg button.on { background: #fff; color: var(--acc); box-shadow: 0 1px 3px rgba(20,22,30,.12); }
 /* состояние генерации маршрута */
 .genwait { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 22px 0 6px; text-align: center; }
 .genwait .hint { margin-top: 0; max-width: 320px; }

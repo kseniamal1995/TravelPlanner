@@ -4,6 +4,7 @@ import { onSheetOpen, onSheetClose } from './tgChrome.js';
 
 /** Вернуть кнопки шита к дефолтному виду (Отмена / Сохранить). */
 export function resetOv() {
+  document.getElementById('ov').classList.remove('fullsheet');  // снять полноэкранный режим формы
   const cancel = document.getElementById('ovCancel');
   cancel.style.display = '';
   cancel.classList.remove('sq');           // снять «квадратную» модификацию формы генерации
