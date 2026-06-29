@@ -18,7 +18,7 @@ const TITLE = 'Новая поездка';
 export function generateTrip() {
   resetOv();
   // Состояние формы переживает перерисовку шагов (вкл. панель импорта).
-  const f = { step: 0, city: '', tripStart: '', end: '', hotel: '', arrival: '', departure: '', arrivalFlight: '', departureFlight: '', arrivalAirport: '', departureAirport: '', flightManual: false, checkin: '', checkout: '', pace: 'med', interests: [], mustSee: '', fixedEvents: '', importState: newImportState() };
+  const f = { step: 0, city: '', tripStart: '', end: '', hotel: '', arrival: '', departure: '', arrivalAirport: '', departureAirport: '', checkin: '', checkout: '', pace: 'med', interests: [], mustSee: '', fixedEvents: '', importState: newImportState() };
   document.getElementById('ov').classList.add('fullsheet');  // форма создания — на весь экран
   renderStep(f);
   openOv();
@@ -32,14 +32,10 @@ function collect(f) {
     f.tripStart = v('g_start') ?? f.tripStart;
     f.end = v('g_end') ?? f.end;
   } else if (f.step === 1) {
-    const fa = document.getElementById('g_arrflight'); if (fa) f.arrivalFlight = fa.value.trim();
-    const fd = document.getElementById('g_depflight'); if (fd) f.departureFlight = fd.value.trim();
-    if (f.flightManual) {
-      f.arrival = v('g_arr') ?? f.arrival;
-      f.departure = v('g_dep') ?? f.departure;
-      const aa = v('g_arrair'); if (aa !== undefined) f.arrivalAirport = aa.trim();
-      const da = v('g_depair'); if (da !== undefined) f.departureAirport = da.trim();
-    }
+    f.arrival = v('g_arr') ?? f.arrival;
+    f.departure = v('g_dep') ?? f.departure;
+    const aa = v('g_arrair'); if (aa !== undefined) f.arrivalAirport = aa.trim();
+    const da = v('g_depair'); if (da !== undefined) f.departureAirport = da.trim();
   } else if (f.step === 2) {
     f.hotel = (v('g_hotel') ?? f.hotel).trim();
     f.checkin = v('g_ci') ?? f.checkin;
@@ -73,21 +69,12 @@ function renderStep(f) {
       + `<div class="two"><div><label>Первый день</label><input id="g_start" type="date" value="${esc(f.tripStart)}"></div>`
       + `<div><label>Последний день</label><input id="g_end" type="date" min="${esc(f.tripStart)}" value="${esc(f.end)}"></div></div>`;
   } else if (f.step === 1) {
-    const seg = `<div class="modeseg"><button type="button" id="g_seg_num" class="${f.flightManual ? '' : 'on'}">По номеру рейса</button>`
-      + `<button type="button" id="g_seg_man" class="${f.flightManual ? 'on' : ''}">Вручную</button></div>`;
     const opt = '<span class="opt">необязательно</span>';
-    const arrFields = f.flightManual
-      ? `<div class="two"><div><label>Время прилёта ${opt}</label><input id="g_arr" type="time" value="${esc(f.arrival)}"></div>`
-        + `<div><label>Аэропорт</label><input id="g_arrair" placeholder="напр. FCO" value="${esc(f.arrivalAirport)}"></div></div>`
-      : `<label>Номер рейса</label><input id="g_arrflight" placeholder="напр. SU2611" value="${esc(f.arrivalFlight)}">`
-        + `<div class="ffinfo" id="g_arrinfo">${flightInfo(f.arrivalAirport, f.arrival)}</div>`;
-    const depFields = f.flightManual
-      ? `<div class="two"><div><label>Время вылета ${opt}</label><input id="g_dep" type="time" value="${esc(f.departure)}"></div>`
-        + `<div><label>Аэропорт</label><input id="g_depair" placeholder="напр. FCO" value="${esc(f.departureAirport)}"></div></div>`
-      : `<label>Номер рейса</label><input id="g_depflight" placeholder="напр. SU2612" value="${esc(f.departureFlight)}">`
-        + `<div class="ffinfo" id="g_depinfo">${flightInfo(f.departureAirport, f.departure)}</div>`;
-    html = seg
-      + `<div class="fsec"><div class="fsec-h"><img src="/emoji/arrival.png" alt=""> Прилёт</div>${arrFields}</div>`
+    const arrFields = `<div class="two"><div><label>Время прилёта ${opt}</label><input id="g_arr" type="time" value="${esc(f.arrival)}"></div>`
+      + `<div><label>Аэропорт</label><input id="g_arrair" placeholder="напр. FCO" value="${esc(f.arrivalAirport)}"></div></div>`;
+    const depFields = `<div class="two"><div><label>Время вылета ${opt}</label><input id="g_dep" type="time" value="${esc(f.departure)}"></div>`
+      + `<div><label>Аэропорт</label><input id="g_depair" placeholder="напр. FCO" value="${esc(f.departureAirport)}"></div></div>`;
+    html = `<div class="fsec"><div class="fsec-h"><img src="/emoji/arrival.png" alt=""> Прилёт</div>${arrFields}</div>`
       + `<div class="fsec"><div class="fsec-h"><img src="/emoji/departure.png" alt=""> Вылет</div>${depFields}</div>`;
   } else if (f.step === 2) {
     const opt = '<span class="opt">необязательно</span>';
@@ -117,16 +104,6 @@ function renderStep(f) {
 
   // Чипсы интересов — тоггл по клику (не нативные инпуты).
   body.querySelectorAll('.chip').forEach((ch) => { ch.onclick = () => { ch.classList.toggle('on'); tg.haptic('light'); }; });
-
-  // Шаг «Перелёт»: сегментный переключатель режима + автозаполнение по номеру рейса.
-  if (f.step === 1) {
-    const num = document.getElementById('g_seg_num');
-    if (num) num.onclick = () => { if (!f.flightManual) return; collect(f); f.flightManual = false; tg.haptic('light'); renderStep(f); };
-    const man = document.getElementById('g_seg_man');
-    if (man) man.onclick = () => { if (f.flightManual) return; collect(f); f.flightManual = true; tg.haptic('light'); renderStep(f); };
-    wireFlight(f, 'g_arrflight', 'g_arrinfo', 'arr');
-    wireFlight(f, 'g_depflight', 'g_depinfo', 'dep');
-  }
 
   // Шаг «Свои места»: панель импорта прямо в форме (та же панель, что и в готовой поездке).
   if (f.step === 5) {
@@ -165,7 +142,6 @@ function submit(f) {
   const input = {
     city: f.city, tripStart: f.tripStart, days: daysBetween(f.tripStart, f.end),
     hotel: f.hotel, arrival: f.arrival, departure: f.departure, checkin: f.checkin, checkout: f.checkout,
-    arrivalFlight: f.arrivalFlight, departureFlight: f.departureFlight,
     arrivalAirport: f.arrivalAirport, departureAirport: f.departureAirport,
     pace: f.pace,
     interests: f.interests,
@@ -212,36 +188,6 @@ export async function runGenerate(input) {
 /** Повторить последнюю упавшую генерацию (кнопка на плашке-заглушке). */
 export function retryPending() {
   if (store.pendingTrip && store.pendingTrip.input) runGenerate(store.pendingTrip.input);
-}
-
-/** Текст-результат под полем номера рейса (аэропорт · время). */
-function flightInfo(airport, time) {
-  if (!airport && !time) return '';
-  return `${ic('plane', 12)} ${esc(airport)}${airport && time ? ' · ' : ''}${esc(time)}`;
-}
-
-/** Повесить автозаполнение на поле номера рейса: при вводе ищем рейс по номеру+дате. */
-function wireFlight(f, inputId, infoId, role) {
-  const inp = document.getElementById(inputId);
-  if (!inp) return;
-  inp.addEventListener('change', async () => {
-    const no = inp.value.trim();
-    const info = document.getElementById(infoId);
-    if (!no) { if (info) info.innerHTML = ''; return; }
-    const date = role === 'arr' ? f.tripStart : (f.end || f.tripStart);
-    if (!date) { if (info) info.innerHTML = 'Сначала укажите даты поездки'; return; }
-    if (info) { info.classList.remove('err'); info.textContent = 'Ищу рейс…'; }
-    let r = null;
-    try { r = await api.flight(no, date); } catch { /* сеть */ }
-    if (r && r.found) {
-      if (role === 'arr') { f.arrival = r.arrTime; f.arrivalAirport = r.arrAirport; }
-      else { f.departure = r.depTime; f.departureAirport = r.depAirport; }
-      if (info) { info.classList.remove('err'); info.innerHTML = flightInfo(role === 'arr' ? r.arrAirport : r.depAirport, role === 'arr' ? r.arrTime : r.depTime); }
-    } else if (info) {
-      info.classList.add('err');
-      info.textContent = 'Не нашли рейс — можно ввести вручную';
-    }
-  });
 }
 
 function splitLines(s) {
