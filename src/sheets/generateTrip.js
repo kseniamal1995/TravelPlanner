@@ -104,7 +104,7 @@ function renderStep(f) {
       + `</div>`;
   } else if (f.step === 5) {
     html = `<label>Свои места из Google Maps <span class="opt">необязательно</span></label>`
-      + `<div class="hint" style="margin:0 0 6px">Вставь ссылку или загрузи скриншот подборки. Места в городе станут точками маршрута, далёкие уйдут в «Идеи».</div>`
+      + `<div class="hint" style="margin:0 0 6px">Загрузи скриншот списка мест или вставь ссылки — учтём их при составлении поездки.</div>`
       + `<div id="g_importpanel"></div>`;
   } else if (f.step === 6) {
     html = `<label>Обязательно увидеть</label>`
