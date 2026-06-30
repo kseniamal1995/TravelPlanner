@@ -67,5 +67,11 @@ export async function initSchema() {
       url        TEXT NOT NULL,
       updated_at ${TS} NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS shared_trip (
+      token      TEXT PRIMARY KEY,
+      owner_id   TEXT NOT NULL,
+      payload    TEXT NOT NULL,
+      created_at ${TS} NOT NULL
+    );
   `);
 }

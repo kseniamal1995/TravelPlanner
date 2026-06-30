@@ -24,6 +24,7 @@ const { default: generateRoutes } = await import('./routes/generate.js');
 const { default: cityImageRoutes } = await import('./routes/cityImage.js');
 const { default: flightRoutes } = await import('./routes/flight.js');
 const { default: importRoutes } = await import('./routes/import.js');
+const { default: shareRoutes } = await import('./routes/share.js');
 
 await initSchema(); // создать таблицы (идемпотентно) до приёма запросов
 
@@ -37,6 +38,7 @@ app.use('/api', generateRoutes);
 app.use('/api', cityImageRoutes);
 app.use('/api', flightRoutes);
 app.use('/api', importRoutes);
+app.use('/api', shareRoutes);
 
 // Раздача собранного фронта, если он есть (prod-сценарий).
 const DIST = join(__dirname, '..', 'dist');

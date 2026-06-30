@@ -16,7 +16,9 @@ export function planHtml() {
   const n = tabs.length;
   const pc = placeCount(c);
   const sub = pc ? `${pc} ${plural(pc, ['место', 'места', 'мест'])}` : `${n} ${plural(n, ['день', 'дня', 'дней'])}`;
-  t += `<div class="ptitle"><h1>${esc(c.name)}</h1><div class="pbtns"><span class="psub">${sub}</span><button class="iconbtn${cityDot(c) ? ' hasdot' : ''}" onclick="goRem('trip')" title="Напоминания по поездке" aria-label="Напоминания">${ic('bell', 18)}</button></div></div></div>`;
+  t += `<div class="ptitle"><h1>${esc(c.name)}</h1><div class="pbtns"><span class="psub">${sub}</span>`
+    + `<button class="iconbtn" onclick="shareTrip()" title="Поделиться маршрутом" aria-label="Поделиться">${ic('ext', 18)}</button>`
+    + `<button class="iconbtn${cityDot(c) ? ' hasdot' : ''}" onclick="goRem('trip')" title="Напоминания по поездке" aria-label="Напоминания">${ic('bell', 18)}</button></div></div></div>`;
 
   // табы дней: точка нагрузки + таб «+» для добавления дня
   t += '<div class="tabs">';

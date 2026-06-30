@@ -45,6 +45,22 @@ export const tg = {
     wa.onEvent?.('themeChanged', applyTheme);
   },
 
+  /** Параметр запуска Mini App из deep-link (?startapp=…). Пусто, если нет. */
+  startParam() {
+    return (wa && wa.initDataUnsafe && wa.initDataUnsafe.start_param) || '';
+  },
+
+  /** Поделиться ссылкой. В Telegram — нативный выбор чата; вне — копируем в буфер.
+   *  Возвращает 'tg' | 'copy' | 'none' — как именно поделились (для тоста). */
+  share(link, text = '') {
+    if (!link) return 'none';
+    if (wa && wa.openTelegramLink) {
+      wa.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent(text));
+      return 'tg';
+    }
+    try { navigator.clipboard.writeText(link); return 'copy'; } catch { return 'none'; }
+  },
+
   /** Тактильный отклик. type: 'light'|'medium'|'heavy'|'success'|'warning'|'error'. */
   haptic(type = 'light') {
     if (!wa || !wa.HapticFeedback) return;

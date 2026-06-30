@@ -19,12 +19,13 @@ import { newTrip } from './sheets/newTrip.js';
 import { generateTrip, retryPending } from './sheets/generateTrip.js';
 import { openArrival } from './sheets/arrival.js';
 import { openDeparture } from './sheets/departure.js';
+import { shareTrip, openSharedPreview } from './sheets/shareTrip.js';
 
 // Экспорт обработчиков для inline-onclick в сгенерированной разметке.
 Object.assign(window, {
   closeOv, undoLast,
   goHome, openTrip2, goRem, setRemTab, dismissIdeasHint, setTab, setIdeas, goView, addDay, delDay,
-  openAdd, openRem, newTrip, generateTrip, retryPending, openArrival, openDeparture,
+  openAdd, openRem, newTrip, generateTrip, retryPending, openArrival, openDeparture, shareTrip,
 });
 
 async function boot() {
@@ -37,6 +38,9 @@ async function boot() {
   document.getElementById('ov').addEventListener('click', (e) => { if (e.target.id === 'ov' && !store.generating) closeOv(); });
   await initState();
   render();
+  // Открыты по deep-link с общим маршрутом? Показать превью для импорта.
+  const sp = tg.startParam();
+  if (sp) openSharedPreview(sp);
 }
 
 boot();

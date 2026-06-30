@@ -85,6 +85,24 @@ export const api = {
     return r.json();
   },
 
+  /** Поделиться маршрутом: сохранить снимок, получить { token, link }. */
+  async shareTrip(city) {
+    const r = await fetch(`${BASE}/share`, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({ city }),
+    });
+    if (!r.ok) throw new Error('share → ' + r.status);
+    return r.json();
+  },
+
+  /** Получить общий маршрут по токену. Возвращает { found, city }. */
+  async getShared(token) {
+    const r = await fetch(`${BASE}/shared/` + encodeURIComponent(token), { headers: headers() });
+    if (!r.ok) return { found: false };
+    return r.json();
+  },
+
   /** Картинка города (кэшируется на сервере). Возвращает URL или ''. */
   async cityImage(city) {
     const r = await fetch(`${BASE}/city-image?city=` + encodeURIComponent(city), { headers: headers() });
