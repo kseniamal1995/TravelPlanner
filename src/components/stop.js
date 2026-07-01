@@ -31,7 +31,8 @@ export function stopHtml(p, c, dly) {
      класс done на карточке + кнопка
      `<button class="vbtn${p.done ? ' on' : ''}" data-act="visit" data-id="${p.id}" title="Был(а) здесь">${ic('check', 15)}</button>`
      и обработчик act === 'visit' в events.js. */
-  let h = `<div class="stop${open ? ' open' : ''}${p.id === store.flashId ? ' flash' : ''}" data-act="card" data-id="${p.id}"${dly != null ? ` style="--d:${dly}ms"` : ''}><div class="stophead"><div class="thumb" data-img="${p.id}">${im ? `<img src="${im}" alt="">` : `<img class="emoji" src="/emoji/${emoId}.png" alt="">`}</div><div class="nm"><div class="nmt">${esc(p.name)}</div>${meta}</div><div class="hright">${tkb}<span class="chev">${ic('chdn', 16)}</span></div></div>`;
+  let h = `<div class="pswipe"${dly != null ? ` style="--d:${dly}ms"` : ''}><div class="pdel">${TRASH}</div>`
+    + `<div class="stop${open ? ' open' : ''}${p.id === store.flashId ? ' flash' : ''}" data-act="card" data-id="${p.id}" data-cid="${c.id}"><div class="stophead"><div class="thumb" data-img="${p.id}">${im ? `<img src="${im}" alt="">` : `<img class="emoji" src="/emoji/${emoId}.png" alt="">`}</div><div class="nm"><div class="nmt">${esc(p.name)}</div>${meta}</div><div class="hright">${tkb}<span class="chev">${ic('chdn', 16)}</span></div></div>`;
   h += `<div class="cbody"><div class="cbin">`;
   if (p.visit) h += `<div class="vtime">${ic('clock', 13)} ${esc(p.visit)}</div>`;
   if (p.booked) h += `<div class="booked">${ic('check', 13)} Забронировано${p.bt ? ' · ' + p.bt : ''}</div>`;
@@ -64,7 +65,7 @@ export function stopHtml(p, c, dly) {
 
   h += `<div class="bottomrow">${p.gmaps ? `<a class="alink" href="${p.gmaps}" target="_blank" rel="noopener">${ic('pin', 13)} Google Maps ${EXT}</a>` : '<span></span>'}<button class="editbtn" data-act="toggle">${PEN} Изменить</button></div>`;
   h += `<div class="editbody"><textarea class="usernote" placeholder="Заметка…" data-act="note" data-id="${p.id}">${esc(p.userNote)}</textarea><div class="editctrl"><select class="mv" data-act="move" data-id="${p.id}">${opts}</select><button class="ic2 del" data-act="del" data-id="${p.id}">${TRASH}</button></div></div>`;
-  h += `</div></div></div>`;
+  h += `</div></div></div></div>`;
   return h;
 }
 

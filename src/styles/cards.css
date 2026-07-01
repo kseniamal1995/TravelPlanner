@@ -15,10 +15,30 @@
   border: none;
 }
 
+/* обёртки свайп-удаления: место и маршрут */
+.pswipe { position: relative; touch-action: pan-y; }
+.pdel {
+  position: absolute; inset: 0; background: var(--red); border-radius: 18px;
+  display: flex; align-items: center; justify-content: flex-end; padding-right: 22px; color: #fff;
+  opacity: 0;
+}
+.pswipe.swiping .pdel { opacity: 1; }
+.stop.swiping { transition: none; }
+
+.tswipe { position: relative; touch-action: pan-y; margin: 12px 0; }
+.tdel {
+  position: absolute; inset: 0; background: var(--red); border-radius: 20px;
+  display: flex; align-items: center; justify-content: flex-end; padding-right: 22px; color: #fff;
+  opacity: 0;
+}
+.tswipe.swiping .tdel { opacity: 1; }
+.tripcard.swiping { transition: none; }
+
 /* карточка поездки */
 .tripcard {
-  border-radius: 20px; padding: 17px; margin: 12px 0; cursor: pointer;
+  border-radius: 20px; padding: 17px; margin: 0; cursor: pointer;
   display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  position: relative; z-index: 1;
 }
 .tripcard .tcbody { flex: 1; min-width: 0; }
 .tripcard .citythumb { cursor: pointer; touch-action: auto; }
@@ -76,7 +96,8 @@
 
 /* карточка места */
 .stop {
-  border-radius: 20px; padding: 15px 16px; margin: 12px 0; cursor: pointer;
+  border-radius: 20px; padding: 15px 16px; margin: 0; cursor: pointer;
+  position: relative; z-index: 1;
 }
 .stophead { display: flex; align-items: center; gap: 10px; }
 .stophead .nm { flex: 1; min-width: 0; }

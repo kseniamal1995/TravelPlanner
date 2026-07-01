@@ -17,7 +17,7 @@ export function homeHtml() {
     const cimg = cityImgCache[id];
     if (cimg === undefined) cityImgQueue.push(c);
     const thumb = `<div class="thumb citythumb" data-cityimg="${id}">${cimg ? `<img src="${cimg}" alt="">` : ic('landmark', 18)}</div>`;
-    cards += `<div class="tripcard" style="--d:${Math.min(ci++, 8) * 40}ms" onclick="openTrip2('${id}')">${thumb}<div class="tcbody"><h3>${esc(c.name)}</h3><div class="meta">${range}${range ? ' · ' : ''}${n} ${plural(n, ['день', 'дня', 'дней'])}${pc ? ' · ' + pc + ' ' + plural(pc, ['место', 'места', 'мест']) : ''}</div></div><div class="go">${ic('chev', 20)}</div></div>`;
+    cards += `<div class="tswipe" style="--d:${Math.min(ci++, 8) * 40}ms"><div class="tdel">${ic('trash', 18)}</div><div class="tripcard" data-cid="${id}" onclick="openTrip2('${id}')">${thumb}<div class="tcbody"><h3>${esc(c.name)}</h3><div class="meta">${range}${range ? ' · ' : ''}${n} ${plural(n, ['день', 'дня', 'дней'])}${pc ? ' · ' + pc + ' ' + plural(pc, ['место', 'места', 'мест']) : ''}</div></div><div class="go">${ic('chev', 20)}</div></div></div>`;
   }
   // плашка-заглушка генерируемой поездки
   let pending = '';
