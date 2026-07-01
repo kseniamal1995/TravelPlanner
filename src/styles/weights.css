@@ -2,7 +2,7 @@
 .desc, .tk .lead, .rdtext, .empty { font-weight: 400; }
 .badge, .dl-meta, .psub, .tripcard .meta, .warn,
 .notepill, .dpnote, .pick, .due.ok { font-weight: 500; }
-.kicker, .leg, .mv, .rcard .rt2, .rcity, .chip, .tab .s, .tk,
+.kicker, .mv, .rcard .rt2, .rcity, .chip, .tab .s, .tk,
 .cmeta .rt, .daypart .tt, .modal label, #toast,
 .nmt, .inforow-tt, .editbtn { font-weight: 600; }
 .booked,

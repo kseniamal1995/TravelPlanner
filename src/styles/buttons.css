@@ -17,6 +17,20 @@
   width: 8px; height: 8px; border-radius: 50%;
   background: var(--red);
 }
+/* белые иконочные кнопки в шапке плана */
+.phbtn {
+  position: relative;
+  background: #fff; border: none; border-radius: 32px;
+  width: 44px; height: 44px; padding: 12px;
+  color: var(--acc); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
+}
+/* точка «есть горящее напоминание» */
+.phbtn.hasdot::after {
+  content: ''; position: absolute; top: 9px; right: 10px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--red); border: 2px solid #fff;
+}
 .btn {
   border: none; background: var(--acc-bg); border-radius: 999px;
   min-height: 44px; padding: 11px 18px; font-weight: 800; font-size: 13px; cursor: pointer;

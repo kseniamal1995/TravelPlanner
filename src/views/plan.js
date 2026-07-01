@@ -13,12 +13,15 @@ export function planHtml() {
   const c = city();
   const tabs = c.days || [];
   let t = `<div class="pbar"><button class="back" onclick="goHome()">${ic('chevl', 15)} Поездки</button>`;
-  const n = tabs.length;
-  const pc = placeCount(c);
-  const sub = pc ? `${pc} ${plural(pc, ['место', 'места', 'мест'])}` : `${n} ${plural(n, ['день', 'дня', 'дней'])}`;
-  t += `<div class="ptitle"><h1>${esc(c.name)}</h1><div class="pbtns"><span class="psub">${sub}</span>`
-    + `<button class="iconbtn" onclick="shareTrip()" title="Поделиться маршрутом" aria-label="Поделиться">${ic('ext', 18)}</button>`
-    + `<button class="iconbtn${cityDot(c) ? ' hasdot' : ''}" onclick="goRem('trip')" title="Напоминания по поездке" aria-label="Напоминания">${ic('bell', 18)}</button></div></div></div>`;
+  const d0 = c.tripStart ? new Date(c.tripStart + 'T12:00:00') : null;
+  const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  const monthYear = d0 ? MONTHS[d0.getMonth()] + ' ' + d0.getFullYear() : '';
+  t += `<div class="ptitle">`
+    + `<div class="phdr-left"><h1>${esc(c.name)}</h1>${monthYear ? `<span class="phsub">${monthYear}</span>` : ''}</div>`
+    + `<div class="pbtns">`
+    + `<button class="phbtn" onclick="shareTrip()" title="Поделиться маршрутом" aria-label="Поделиться">${ic('share', 20)}</button>`
+    + `<button class="phbtn" title="Настройки поездки" aria-label="Настройки">${ic('sliders', 20)}</button>`
+    + `</div></div></div>`;
 
   // табы дней: точка нагрузки + таб «+» для добавления дня
   t += '<div class="tabs">';
@@ -84,7 +87,7 @@ export function planHtml() {
       if (p.sect.note) t += `<div class="dpnote" style="--d:${d}ms">${esc(p.sect.note)}</div>`;
     }
     t += stopHtml(p, c, d);
-    if (p.leg && i < list.length - 1) t += `<div class="leg" style="--d:${Math.min(i + 1, 8) * 28}ms"><div class="ln"></div><span class="txt">${legHtml(p.leg, false)}</span></div>`;
+    if (p.leg && i < list.length - 1) t += `<div class="leg" style="--d:${Math.min(i + 1, 8) * 28}ms">${legHtml(p.leg, false, 16)}</div>`;
   });
   const lastId = tabs.length ? tabs[tabs.length - 1].id : null;
   if (c.activeTab === lastId) t += departureRow(c);

@@ -14,8 +14,10 @@
   padding: 4px 0; display: inline-flex; align-items: center; gap: 3px; min-height: 40px;
 }
 .ptitle { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 4px; }
-.ptitle h1 { font-size: 30px; }
-.pbtns { display: flex; gap: 10px; flex: 0 0 auto; align-items: center; }
+.ptitle h1 { font-size: 28px; font-family: var(--display); font-weight: 600; color: #000; letter-spacing: -.01em; }
+.phdr-left { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.phsub { font-size: 12px; font-weight: 600; color: var(--soft); }
+.pbtns { display: flex; gap: 8px; flex: 0 0 auto; align-items: center; }
 .psub { color: var(--soft); font-size: 14px; font-weight: 600; margin: 8px 2px 0; line-height: 1.4; }
 .pbtns .psub { margin: 0; white-space: nowrap; }
 

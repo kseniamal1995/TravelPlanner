@@ -38,6 +38,8 @@ export const PATHS = {
   leaf: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>',
   camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
   dots: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+  share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>',
+  sliders: '<line x1="3" x2="15" y1="8" y2="8"/><circle cx="18" cy="8" r="2.75"/><circle cx="6" cy="16" r="2.75"/><line x1="9" x2="21" y1="16" y2="16"/>',
   // звезда с мягко скруглёнными вершинами (для рейтинга)
   star: '<path d="M11.48 3.06a.58.58 0 0 1 1.04 0l2.3 4.9 5.18.66a.58.58 0 0 1 .32 1l-3.86 3.66 1.02 5.32a.58.58 0 0 1-.85.6L12 16.5l-4.63 2.7a.58.58 0 0 1-.85-.6l1.02-5.32L3.68 9.62a.58.58 0 0 1 .32-1l5.18-.66Z"/>',
 };
@@ -60,9 +62,9 @@ export const TRASH = ic('trash', 16);
 export const MOVE = { walk: 'walk', metro: 'train', bus: 'bus', car: 'car' };
 
 /** Текст перегона: иконка транспорта + время (+ описание, если full). */
-export function legHtml(l, full) {
+export function legHtml(l, full, sz = 13) {
   if (!l) return '';
-  let s = ic(MOVE[l.m] || 'walk', 13) + (l.t ? ' ' + l.t : '');
+  let s = ic(MOVE[l.m] || 'walk', sz) + (l.t ? ' ' + l.t : '');
   if (full && l.to) s += ' · ' + l.to;
   return s;
 }

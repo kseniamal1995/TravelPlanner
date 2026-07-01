@@ -16,6 +16,12 @@
 .bnav button .bi { display: flex; line-height: 1; transition: transform .22s cubic-bezier(.3,1.4,.4,1); }
 .bnav button.on { color: var(--acc); background: var(--acc-bg); }
 .bnav button.on .bi { transform: translateY(-1px); }
+.bnav button.hasdot { position: relative; }
+.bnav button.hasdot .bi::after {
+  content: ''; position: absolute; top: 6px; right: calc(50% - 14px);
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--red); border: 2px solid #fff;
+}
 
 /* ── Внутри Telegram (body.tg-app) ── */
 /* Нативная кнопка «назад» Telegram заменяет встроенную «← Поездки». */

@@ -16,7 +16,8 @@
 }
 
 /* обёртки свайп-удаления: место и маршрут */
-.pswipe { position: relative; touch-action: pan-y; }
+.pswipe { position: relative; touch-action: pan-y; margin-bottom: 12px; }
+.pswipe:last-of-type { margin-bottom: 0; }
 .pdel {
   position: absolute; inset: 0; background: var(--red); border-radius: 18px;
   display: flex; align-items: center; justify-content: flex-end; padding-right: 22px; color: #fff;
@@ -34,19 +35,24 @@
 .tswipe.swiping .tdel { opacity: 1; }
 .tripcard.swiping { transition: none; }
 
-/* карточка поездки */
+/* карточка поездки — тот же вид, что и карточка места (.stop), плюс шеврон */
 .tripcard {
-  border-radius: 20px; padding: 17px; margin: 0; cursor: pointer;
-  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  border-radius: 12px; padding: 6px 8px 6px 6px; margin: 0; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
   position: relative; z-index: 1;
 }
-.tripcard .tcbody { flex: 1; min-width: 0; }
-.tripcard .citythumb { cursor: pointer; touch-action: auto; }
-.tripcard h3 { font-size: 20px; }
-.tripcard .meta { color: var(--soft); font-size: 13.5px; font-weight: 600; margin-top: 3px; }
-.tripcard .go { color: var(--soft2); display: flex; align-items: center; }
+.tripcard .stophead { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; }
+.tripcard .citythumb {
+  width: 64px; height: 64px; border-radius: 8px; flex: 0 0 64px;
+  cursor: pointer; touch-action: auto;
+}
+/* название поездки — display-шрифт Unbounded (заметнее названий мест) */
+.tripcard .snmt { font-family: var(--display); font-size: 14px; letter-spacing: -.01em; }
+.tcmeta { color: var(--soft); font-size: 12px; font-weight: 400; margin-top: 4px; line-height: 1.35; }
+.tripcard .go { color: var(--soft2); display: flex; align-items: center; flex: 0 0 auto; }
 /* плашка-заглушка генерируемой поездки */
-.tripcard.pending { cursor: default; position: relative; overflow: hidden; }
+.tripcard.pending { cursor: default; position: relative; overflow: hidden; justify-content: space-between; padding: 16px; }
+.tripcard.pending .sinfo { flex: 1; min-width: 0; }
 .tripcard.pending::after {
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(90deg, transparent, rgba(94, 92, 230, .10), transparent);
@@ -58,10 +64,9 @@
 
 /* перегоны и «старт» */
 .leg {
-  display: flex; align-items: center; gap: 8px; color: var(--soft);
-  font-size: 12.5px; margin: 1px 2px; font-weight: 700;
+  display: flex; align-items: center; gap: 4px; color: var(--soft);
+  font-size: 12px; margin: -4px 0 8px; font-weight: 400;
 }
-.leg .ln { width: 2px; height: 15px; background: var(--line2); margin-left: 3px; border-radius: 2px; }
 /* ссылка «от отеля до первой точки» — перегон-пилюля с акцентным текстом */
 .startlink .txt { color: var(--acc); }
 /* раскрываемый стартовый перегон */
@@ -96,29 +101,39 @@
 
 /* карточка места */
 .stop {
-  border-radius: 20px; padding: 15px 16px; margin: 0; cursor: pointer;
+  border-radius: 12px; padding: 6px 8px 6px 6px; margin: 0; cursor: pointer;
   position: relative; z-index: 1;
 }
-.stophead { display: flex; align-items: center; gap: 10px; }
-.stophead .nm { flex: 1; min-width: 0; }
-.nmt { font-size: 15px; line-height: 1.3; }
+.stophead { display: flex; align-items: center; gap: 12px; }
+.stop .thumb { width: 72px; height: 72px; border-radius: 8px; flex: 0 0 72px; overflow: hidden; }
+.stop .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* мета-строка: категория · рейтинг · иконки предупреждения/заметки */
-.cmeta .rt { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 3px; line-height: 1; color: var(--ink); font-size: 12.5px; font-weight: 600; margin: 0; white-space: nowrap; }
-.cmeta .rt .star { color: var(--amber); }
-.cmeta .mic { display: inline-flex; align-items: center; color: var(--soft2); }
-.cmeta .mic.alert { color: var(--red); }
+/* колонка с инфо */
+.sinfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 2px 0; }
 
-/* правая колонка карточки: бейдж билета + шеврон, по центру высоты */
-.hright { align-self: center; display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
-.tkb {
-  width: 28px; height: 28px; border-radius: 999px;
-  display: flex; align-items: center; justify-content: center;
+/* строка 1: название */
+.snmt { font-size: 14px; font-weight: 600; line-height: 1.2; color: #000; }
+
+/* строка 2: категория + алерт/заметка */
+.stags { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.salert {
+  width: 22px; height: 22px; border-radius: 12px; flex: 0 0 22px;
+  background: var(--red-bg); color: var(--red);
+  display: inline-flex; align-items: center; justify-content: center;
 }
-.tkb.need { background: var(--amber-bg); color: var(--amber); }
-.tkb.ok { background: var(--green-bg); color: var(--green); }
-.chev { color: var(--soft2); display: inline-flex; flex: 0 0 auto; transition: transform .25s; }
-.stop.open .chev { transform: rotate(180deg); }
+.snote {
+  width: 22px; height: 22px; border-radius: 12px; flex: 0 0 22px;
+  background: var(--gray-bg); color: var(--soft);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+/* строка 3: рейтинг + статус билета */
+.smeta { display: flex; align-items: center; gap: 12px; }
+.sstar { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; color: var(--soft); }
+.sstar .star { color: var(--star); }
+.sticket { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; color: var(--soft); }
+.sticket.ok .i { color: var(--green); }
+.sticket.need .i { color: var(--amber); }
 
 .cbody { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s cubic-bezier(.4,0,.2,1); }
 .stop.open .cbody { grid-template-rows: 1fr; }
