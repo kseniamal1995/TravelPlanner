@@ -5,6 +5,7 @@ import { homeHtml } from './views/home.js';
 import { planHtml } from './views/plan.js';
 import { ideasHtml } from './views/ideas.js';
 import { remHtml } from './views/reminders.js';
+import { settingsHtml, bindSettings } from './views/settings.js';
 import { bnavHtml } from './views/nav.js';
 import { fetchImg, fetchCityImg } from './services/photos.js';
 import { applyWx, ensureWeather } from './services/weather.js';
@@ -16,8 +17,10 @@ export function render() {
   if (store.view === 'home') h = homeHtml();
   else if (store.view === 'ideas') h = ideasHtml();
   else if (store.view === 'reminders') h = remHtml();
+  else if (store.view === 'settings') h = settingsHtml();
   else h = planHtml();
-  if (store.view !== 'home' && store.S.activeCity) h += bnavHtml();
+  // нижняя навигация — на экранах поездки, кроме настроек (это отдельная подстраница)
+  if (store.view !== 'home' && store.view !== 'settings' && store.S.activeCity) h += bnavHtml();
 
   app.classList.toggle('anim', store.animPending);
   store.animPending = false;
@@ -37,6 +40,8 @@ export function render() {
     fade();
     tabs.addEventListener('scroll', fade, { passive: true });
   }
+
+  bindSettings(app); // тоггл чипсов на подстранице настроек «Маршрут»
 
   syncNav(); // синхронизировать нативную кнопку «назад» Telegram с текущим экраном
 }

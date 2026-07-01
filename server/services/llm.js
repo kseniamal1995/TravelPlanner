@@ -29,7 +29,7 @@ const RULES = `Ты планируешь пешие маршруты путеш�
 ЯЗЫК: весь отображаемый текст — на русском (name, desc, theme, visit, sect.t/sect.note, ticket.price/lead, warnH, warnS). Поле rname — официальное название на местном/английском языке для геокодирования (напр. name «Лувр», rname «Louvre Museum, Paris»).
 РЕЙТИНГ: поле rating — по 5-балльной шкале Google, десятичный разделитель ЗАПЯТАЯ (напр. «4,6»). Если не уверен в значении — оставь пустым ''. Никогда не используй 10-балльную шкалу.
 НАЗВАНИЯ: name — короткое имя места (напр. «Лувр», «Сад Тюильри»), без префиксов вроде «Завтрак: …». Тип активности передавай через desc, а не в name.
-КРАТКОСТЬ (ВАЖНО для скорости ответа): desc — одно короткое предложение (до ~12 слов). Не больше 6 точек в день. Не повторяй одно и то же в разных полях. Заполняй ticket/warnH/warnS/sect только когда это реально важно, иначе опускай.
+КРАТКОСТЬ (ВАЖНО для скорости ответа): desc — одно короткое предложение (до ~12 слов). Не повторяй одно и то же в разных полях. Заполняй ticket/warnH/warnS/sect только когда это реально важно, иначе опускай.
 БИЛЕТЫ: объект ticket добавляй ТОЛЬКО местам с платным входом или брони (музеи, башни, дворцы, забронированные события). Для парков, набережных, смотровых, еды, прогулок и любых бесплатных мест ticket НЕ добавляй.
 ССЫЛКИ: URL клади ТОЛЬКО в ticket.url. Никогда не вставляй ссылки (http…) в desc, warnH, warnS, ticket.lead и другие текстовые поля.
 ПЕРЕГОН: leg.t — время в пути до следующей точки в формате «N мин» (например «8 мин»), m — способ (walk/metro/bus/car). Без единиц не пиши.
@@ -180,7 +180,7 @@ async function callClaudeDay(input) {
     headers: { 'content-type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 3000,
+      max_tokens: 8000,
       system: [
         { type: 'text', text: RULES, cache_control: { type: 'ephemeral' } },
         { type: 'text', text: 'Отвечай только валидным JSON-объектом без markdown-обёртки.' },
@@ -190,6 +190,7 @@ async function callClaudeDay(input) {
   });
   if (!res.ok) throw new Error('Anthropic ' + res.status + ': ' + (await res.text()).slice(0, 300));
   const data = await res.json();
+  if (data.stop_reason === 'max_tokens') throw new Error('Ответ модели обрезан по лимиту токенов (max_tokens)');
   const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
   return parseJson(text);
 }
@@ -218,7 +219,7 @@ async function callClaude(input, profile, known) {
     },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 8000,
+      max_tokens: 32000,
       system: [
         { type: 'text', text: RULES, cache_control: { type: 'ephemeral' } },
         { type: 'text', text: 'Отвечай только валидным JSON-объектом без markdown-обёртки.' },
@@ -231,6 +232,8 @@ async function callClaude(input, profile, known) {
     throw new Error('Anthropic ' + res.status + ': ' + t.slice(0, 300));
   }
   const data = await res.json();
+  // Ответ обрезан по лимиту токенов → JSON неполный. Явная ошибка вместо тихого падения парсера.
+  if (data.stop_reason === 'max_tokens') throw new Error('Ответ модели обрезан по лимиту токенов (max_tokens) — маршрут слишком большой');
   const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
   return parseJson(text);
 }

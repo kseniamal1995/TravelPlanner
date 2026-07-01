@@ -2,16 +2,18 @@
  * Собирает вход для движка (город, даты, отель/прилёт/заселение, темп, интересы,
  * must-see, забронированные мероприятия), зовёт POST /api/generate и вливает
  * готовый City в store. См. docs/06-telegram-migration.md §2 (онбординг). */
-import { DAY_THEMES } from '../config.js';
 import { ic } from '../icons.js';
-import { store, save } from '../store.js';
+import { store, save, city as getActiveCity } from '../store.js';
 import { render } from '../render.js';
 import { resetOv, openOv, closeOv } from '../ui/sheet.js';
 import { api } from '../services/api.js';
 import { tg } from '../services/telegram.js';
 import { mountImportPanel, newImportState, selectedPlaces, placeFromImport } from './importPlaces.js';
+import {
+  cityField, datesField, flightFields, hotelFields, paceField, interestsField, mustSeeField, eventsField,
+  bindChips, collectCity, collectDates, collectFlight, collectHotel, collectPace, collectInterests, collectMustSee, collectEvents,
+} from './tripFields.js';
 
-const PACE = [['low', 'Спокойный'], ['med', 'Средний'], ['high', 'Активный']];
 const STEPS = ['Город и даты', 'Перелёт', 'Отель', 'Темп', 'Интересы', 'Свои места', 'Мероприятия'];
 const TITLE = 'Новая поездка';
 
@@ -26,31 +28,13 @@ export function generateTrip() {
 
 /** Считать значения видимых полей текущего шага в f (перед сменой шага). */
 function collect(f) {
-  const v = (id) => { const el = document.getElementById(id); return el ? el.value : undefined; };
-  if (f.step === 0) {
-    f.city = (v('g_city') ?? f.city).trim();
-    f.tripStart = v('g_start') ?? f.tripStart;
-    f.end = v('g_end') ?? f.end;
-  } else if (f.step === 1) {
-    f.arrival = v('g_arr') ?? f.arrival;
-    f.departure = v('g_dep') ?? f.departure;
-    const aa = v('g_arrair'); if (aa !== undefined) f.arrivalAirport = aa.trim();
-    const da = v('g_depair'); if (da !== undefined) f.departureAirport = da.trim();
-  } else if (f.step === 2) {
-    f.hotel = (v('g_hotel') ?? f.hotel).trim();
-    f.checkin = v('g_ci') ?? f.checkin;
-    f.checkout = v('g_co') ?? f.checkout;
-  } else if (f.step === 3) {
-    const checked = document.querySelector('#ovBody input[name="g_pace"]:checked');
-    if (checked) f.pace = checked.value;
-  } else if (f.step === 4) {
-    f.interests = [...document.querySelectorAll('#ovBody .chip.on')].map((x) => x.dataset.v);
-  } else if (f.step === 5) {
-    // Шаг «Свои места»: выбор хранится в f.importState (панель), отдельный collect не нужен.
-  } else if (f.step === 6) {
-    f.mustSee = v('g_must') ?? f.mustSee;
-    f.fixedEvents = v('g_events') ?? f.fixedEvents;
-  }
+  if (f.step === 0) { collectCity(f); collectDates(f); }
+  else if (f.step === 1) collectFlight(f);
+  else if (f.step === 2) collectHotel(f);
+  else if (f.step === 3) collectPace(f);
+  else if (f.step === 4) collectInterests(f);
+  // step 5 «Свои места»: выбор в f.importState (панель), отдельный collect не нужен.
+  else if (f.step === 6) { collectMustSee(f); collectEvents(f); }
 }
 
 function progBar(step, total) {
@@ -65,45 +49,26 @@ function renderStep(f) {
   let html = '';
 
   if (f.step === 0) {
-    html = `<label>Город</label><input id="g_city" placeholder="напр. Лиссабон" value="${esc(f.city)}">`
-      + `<div class="two"><div><label>Первый день</label><input id="g_start" type="date" value="${esc(f.tripStart)}"></div>`
-      + `<div><label>Последний день</label><input id="g_end" type="date" min="${esc(f.tripStart)}" value="${esc(f.end)}"></div></div>`;
+    html = cityField(f) + datesField(f);
   } else if (f.step === 1) {
-    const opt = '<span class="opt">необязательно</span>';
-    const arrFields = `<div class="two"><div><label>Время прилёта ${opt}</label><input id="g_arr" type="time" value="${esc(f.arrival)}"></div>`
-      + `<div><label>Аэропорт</label><input id="g_arrair" placeholder="напр. FCO" value="${esc(f.arrivalAirport)}"></div></div>`;
-    const depFields = `<div class="two"><div><label>Время вылета ${opt}</label><input id="g_dep" type="time" value="${esc(f.departure)}"></div>`
-      + `<div><label>Аэропорт</label><input id="g_depair" placeholder="напр. FCO" value="${esc(f.departureAirport)}"></div></div>`;
-    html = `<div class="fsec"><div class="fsec-h"><img src="/emoji/arrival.png" alt=""> Прилёт</div>${arrFields}</div>`
-      + `<div class="fsec"><div class="fsec-h"><img src="/emoji/departure.png" alt=""> Вылет</div>${depFields}</div>`;
+    html = flightFields(f);
   } else if (f.step === 2) {
-    const opt = '<span class="opt">необязательно</span>';
-    html = `<label>Отель или район ${opt}</label><input id="g_hotel" placeholder="можно указать позже" value="${esc(f.hotel)}">`
-      + `<div class="two"><div><label>Время заезда ${opt}</label><input id="g_ci" type="time" value="${esc(f.checkin)}"></div>`
-      + `<div><label>Время выезда ${opt}</label><input id="g_co" type="time" value="${esc(f.checkout)}"></div></div>`;
+    html = hotelFields(f);
   } else if (f.step === 3) {
-    html = `<label>Темп прогулок</label><div class="picklist nodiv">`
-      + PACE.map(([val, t]) => `<label class="pick"><input type="radio" name="g_pace" value="${val}" ${f.pace === val ? 'checked' : ''}><span>${t}</span></label>`).join('')
-      + `</div>`;
+    html = paceField(f);
   } else if (f.step === 4) {
-    html = `<label>Интересы</label><div class="chips">`
-      + DAY_THEMES.map(([, t, icon]) => `<button type="button" class="chip${f.interests.includes(t) ? ' on' : ''}" data-v="${esc(t)}">${ic(icon, 15)} ${t}</button>`).join('')
-      + `</div>`;
+    html = interestsField(f);
   } else if (f.step === 5) {
     html = `<label>Свои места из Google Maps <span class="opt">необязательно</span></label>`
       + `<div class="hint" style="margin:0 0 6px">Загрузи скриншот списка мест или вставь ссылки — учтём их при составлении поездки.</div>`
       + `<div id="g_importpanel"></div>`;
   } else if (f.step === 6) {
-    html = `<label>Обязательно увидеть</label>`
-      + `<textarea id="g_must" rows="3" placeholder="Например:&#10;Колизей&#10;Ватикан">${esc(f.mustSee)}</textarea>`
-      + `<label>Забронированные мероприятия</label>`
-      + `<textarea id="g_events" rows="4" placeholder="Необязательно">${esc(f.fixedEvents)}</textarea>`
-      + `<div class="hint">Напишите мероприятия, на которые у вас уже куплены билеты. Приложение учтёт их при составлении поездки.</div>`;
+    html = mustSeeField(f) + eventsField(f);
   }
   body.innerHTML = progBar(f.step, STEPS.length) + html;
 
   // Чипсы интересов — тоггл по клику (не нативные инпуты).
-  body.querySelectorAll('.chip').forEach((ch) => { ch.onclick = () => { ch.classList.toggle('on'); tg.haptic('light'); }; });
+  bindChips(body);
 
   // Шаг «Свои места»: панель импорта прямо в форме (та же панель, что и в готовой поездке).
   if (f.step === 5) {
@@ -153,8 +118,9 @@ function submit(f) {
   runGenerate(input);
 }
 
-/** Генерация в фоне: закрытая форма → плашка-заглушка на главной → готовый маршрут. */
-export async function runGenerate(input) {
+/** Генерация в фоне: закрытая форма → плашка-заглушка на главной → готовый маршрут.
+ *  replaceId — id заменяемой поездки (перегенерация): старая удаляется после успеха. */
+export async function runGenerate(input, replaceId = null) {
   store.pendingTrip = { city: input.city, input };
   store.view = 'home';
   store.S.activeCity = null;
@@ -169,7 +135,15 @@ export async function runGenerate(input) {
       let order = Math.max(0, ...city.places.filter((x) => x.bucket === 'later').map((x) => x.order + 1), 0);
       for (const p of input._farIdeas) city.places.push(placeFromImport(p, city.name || input.city, order++));
     }
+    // сохраняем вход генерации на город — для экрана «Настройки поездки» и перегенерации
+    city.genInput = {
+      pace: input.pace, interests: input.interests || [],
+      mustSee: input.mustSee || [], fixedEvents: input.fixedEvents || [],
+      arrivalAirport: input.arrivalAirport || '', departureAirport: input.departureAirport || '',
+    };
+    city.dirty = false;
     store.S.cities[city.id] = city;
+    if (replaceId && replaceId !== city.id) delete store.S.cities[replaceId]; // перегенерация: убрать старую версию
     store.S.activeCity = city.id;
     store.view = 'plan';
     await save();
@@ -190,6 +164,59 @@ export function retryPending() {
   if (store.pendingTrip && store.pendingTrip.input) runGenerate(store.pendingTrip.input);
 }
 
+/** Вход генерации из текущего города (для перегенерации по изменённым настройкам). */
+function cityToGenInput(c) {
+  const g = c.genInput || {};
+  return {
+    city: c.name,
+    tripStart: c.tripStart,
+    days: (c.days || []).length || 3,
+    hotel: (c.hotel && c.hotel.name) || '',
+    arrival: c.arrival || '', departure: c.departure || '',
+    checkin: c.checkin || '', checkout: c.checkout || '',
+    arrivalAirport: c.arrivalAirport || g.arrivalAirport || '',
+    departureAirport: c.departureAirport || g.departureAirport || '',
+    pace: g.pace || 'med',
+    interests: g.interests || [],
+    mustSee: g.mustSee || [],
+    fixedEvents: g.fixedEvents || [],
+  };
+}
+
+/** Диалог выбора перед перегенерацией: пересобрать заново или сохранить места. */
+export function openRegenerate() {
+  const c = getActiveCity();
+  if (!c || !c.dirty) return;
+  resetOv();
+  document.getElementById('ovTitle').textContent = 'Перегенерировать поездку';
+  document.getElementById('ovBody').innerHTML =
+    `<div class="hint" style="margin:2px 0 16px">Настройки изменились. Как обновить маршрут?</div>`
+    + `<div class="regen-opts">`
+    + `<button class="regen-opt" onclick="regenerateTrip(true)"><div class="regen-opt-t">Сохранить мои места</div>`
+    + `<div class="regen-opt-s">Оставим уже добавленные места и разложим их по новым дням и настройкам</div></button>`
+    + `<button class="regen-opt" onclick="regenerateTrip(false)"><div class="regen-opt-t">Пересобрать заново</div>`
+    + `<div class="regen-opt-s">Соберём маршрут с нуля. Ручные правки и добавленные места не сохранятся</div></button>`
+    + `</div>`;
+  // прячем стандартные кнопки шита — выбор делается опциями
+  document.getElementById('ovSave').style.display = 'none';
+  document.getElementById('ovCancel').textContent = 'Отмена';
+  openOv();
+}
+
+/** Запустить перегенерацию. keepPlaces — подмешать текущие места в must-see. */
+export function regenerateTrip(keepPlaces) {
+  const c = getActiveCity();
+  if (!c) return;
+  const oldId = store.S.activeCity;
+  const input = cityToGenInput(c);
+  if (keepPlaces) {
+    const inDay = (c.places || []).filter((p) => (c.days || []).some((d) => d.id === p.bucket)).map((p) => p.name);
+    input.mustSee = [...new Set([...(input.mustSee || []), ...inDay])];
+  }
+  closeOv();
+  runGenerate(input, oldId);
+}
+
 function splitLines(s) {
   return String(s || '').split('\n').map((x) => x.trim()).filter(Boolean);
 }
@@ -201,8 +228,4 @@ function daysBetween(start, end) {
   const b = new Date(end + 'T00:00:00');
   const d = Math.round((b - a) / 86400000) + 1;
   return d >= 1 ? d : 1;
-}
-
-function esc(s) {
-  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }

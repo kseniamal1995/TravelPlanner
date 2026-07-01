@@ -96,7 +96,7 @@
 /* списки выбора в шите дня */
 .picklist {
   display: flex; flex-direction: column; margin-top: 6px; max-height: 240px; overflow: auto;
-  border: 1px solid var(--line); border-radius: 16px; padding: 2px 12px;
+  background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 2px 12px;
 }
 /* .pick — это <label>, поэтому селектор специфичнее `.modal label` (иначе display:block ломает строку) */
 .picklist .pick {

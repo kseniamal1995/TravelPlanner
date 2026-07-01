@@ -20,10 +20,10 @@ export function planHtml() {
     + `<div class="phdr-left"><h1>${esc(c.name)}</h1>${monthYear ? `<span class="phsub">${monthYear}</span>` : ''}</div>`
     + `<div class="pbtns">`
     + `<button class="phbtn" onclick="shareTrip()" title="Поделиться маршрутом" aria-label="Поделиться">${ic('share', 20)}</button>`
-    + `<button class="phbtn" title="Настройки поездки" aria-label="Настройки">${ic('sliders', 20)}</button>`
+    + `<button class="phbtn" onclick="openSettings()" title="Настройки поездки" aria-label="Настройки">${ic('sliders', 20)}</button>`
     + `</div></div></div>`;
 
-  // табы дней: точка нагрузки + таб «+» для добавления дня
+  // табы дней (добавление/удаление дня — в настройках поездки → «Даты поездки»)
   t += '<div class="tabs">';
   tabs.forEach((d, i) => {
     const lab = dayLabel(c.tripStart, i);
@@ -33,7 +33,6 @@ export function planHtml() {
        full → `<span class="idot full">${ic('check', 8)}</span>` */
     t += `<div class="tab${c.activeTab === d.id ? ' on' : ''}" data-day="${d.id}" onclick="setTab('${d.id}')"><div class="d">${lab.d}</div><div class="s">${lab.s || ''}</div><span class="idot lv-${intensity(c, d.id).level}"></span></div>`;
   });
-  t += `<div class="tab add" onclick="addDay()" title="Добавить день">${ic('plus', 16)}</div>`;
   t += '</div>';
 
   // строка дня: кнопка маршрута слева, описание дня (нагрузка · счётчик · погода) справа
@@ -75,10 +74,9 @@ export function planHtml() {
     t += `<a class="leg startleg startlink" href="${url}" target="_blank" rel="noopener"><span class="txt">${ic('bed', 14)} От отеля до «${esc(list[0].name)}» ${EXT}</span></a>`;
   }
 
-  const delBtn = tabs.length > 1 ? `<button class="ghostbtn danger" onclick="delDay('${c.activeTab}')">${ic('trash', 13)} Удалить день</button>` : '';
   if (!list.length) {
     t += emptyHtml('sparkles', 'День пока пуст', 'Добавь места вручную — или перенеси из идей');
-    t += `<div class="emptyact"><button class="btn acc" onclick="openAdd()">${ic('plus', 15)} Добавить место</button>${delBtn}</div>`;
+    t += `<div class="emptyact"><button class="btn acc" onclick="openAdd()">${ic('plus', 15)} Добавить место</button></div>`;
   }
   list.forEach((p, i) => {
     const d = Math.min(i, 8) * 28;
@@ -91,6 +89,6 @@ export function planHtml() {
   });
   const lastId = tabs.length ? tabs[tabs.length - 1].id : null;
   if (c.activeTab === lastId) t += departureRow(c);
-  if (list.length) t += `<div class="actions"><button class="btn acc" onclick="openAdd()">${ic('plus', 15)} Добавить место</button><span style="flex:1"></span>${delBtn}</div>`;
+  if (list.length) t += `<div class="actions"><button class="btn acc" onclick="openAdd()">${ic('plus', 15)} Добавить место</button></div>`;
   return t;
 }

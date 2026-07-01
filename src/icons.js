@@ -40,6 +40,9 @@ export const PATHS = {
   dots: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
   share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>',
   sliders: '<line x1="3" x2="15" y1="8" y2="8"/><circle cx="18" cy="8" r="2.75"/><circle cx="6" cy="16" r="2.75"/><line x1="9" x2="21" y1="16" y2="16"/>',
+  calendar: '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/>',
+  building: '<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 14h.01"/>',
+  refresh: '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
   // звезда с мягко скруглёнными вершинами (для рейтинга)
   star: '<path d="M11.48 3.06a.58.58 0 0 1 1.04 0l2.3 4.9 5.18.66a.58.58 0 0 1 .32 1l-3.86 3.66 1.02 5.32a.58.58 0 0 1-.85.6L12 16.5l-4.63 2.7a.58.58 0 0 1-.85-.6l1.02-5.32L3.68 9.62a.58.58 0 0 1 .32-1l5.18-.66Z"/>',
 };

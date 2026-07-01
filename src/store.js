@@ -9,7 +9,8 @@ import { storage } from './services/storage.js';
 
 export const store = {
   S: null,             // персистентное состояние
-  view: 'home',        // 'home' | 'plan' | 'ideas' | 'reminders'
+  view: 'home',        // 'home' | 'plan' | 'ideas' | 'reminders' | 'settings'
+  settingsSub: null,   // подстраница настроек: null (список) | 'dates' | 'hotel' | 'flight' | 'route'
   ideasTab: 'shop',    // активная под-вкладка идей
   remTab: 'all',       // активный таб напоминаний: 'all' | cityId
   undoSnap: null,      // снапшот для undo

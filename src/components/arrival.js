@@ -5,9 +5,15 @@ import { ic } from '../icons.js';
 import { esc } from '../lib/format.js';
 
 export function arrivalRow(c) {
-  const sub = (c.hotel && c.hotel.name)
-    ? esc(c.hotel.name) + (c.checkin ? ` · заезд ${c.checkin}` : '')
-    : 'Добавьте отель и время прибытия';
+  // Отель не указан → компактная карточка-приглашение (Figma 38-2241).
+  if (!(c.hotel && c.hotel.name)) {
+    return `<button class="setcard hotelprompt" onclick="openArrival()">`
+      + `<span class="setcard-ic">${ic('building', 20)}</span>`
+      + `<span class="setcard-tt"><span class="setcard-t1">Добавить отель и время прибытия</span></span>`
+      + `<span class="setcard-chev">${ic('chev', 20)}</span></button>`;
+  }
+  // Отель есть → строка «Прибытие и заселение» с 3D-иконкой.
+  const sub = esc(c.hotel.name) + (c.checkin ? ` · заезд ${c.checkin}` : '');
   const chip = c.arrival ? `<span class="inforow-chip">${ic('landing', 13)} ${c.arrival}</span>` : '';
   return `<button class="inforow" onclick="openArrival()"><span class="inforow-ic"><img src="/emoji/arrival.png" alt=""></span><span class="inforow-tt"><span class="inforow-t1">Прибытие и заселение</span><span class="inforow-t2">${sub}</span></span>${chip}<span class="inforow-chev">${ic('chev', 18)}</span></button>`;
 }

@@ -10,13 +10,13 @@ import { registerSwipe } from './ui/swipe.js';
 import { tg } from './services/telegram.js';
 import { closeOv } from './ui/sheet.js';
 import { undoLast } from './ui/toast.js';
-import { goHome, openTrip2, goRem, setRemTab, dismissIdeasHint, setTab, setIdeas, goView, addDay, delDay } from './navigation.js';
+import { goHome, openTrip2, goRem, setRemTab, dismissIdeasHint, setTab, setIdeas, goView, addDay, delDay, openSettings, openSettingsSub, settingsBack, saveSettingsSub } from './navigation.js';
 // Шиты «Настроить день» (sheets/daySheet.js) и «Настройки поездки» (sheets/tripSettings.js)
 // отключены в итерации 6 — файлы сохранены как наработки.
 import { openAdd } from './sheets/addPlace.js';
 import { openRem } from './sheets/reminder.js';
 import { newTrip } from './sheets/newTrip.js';
-import { generateTrip, retryPending } from './sheets/generateTrip.js';
+import { generateTrip, retryPending, openRegenerate, regenerateTrip } from './sheets/generateTrip.js';
 import { openArrival } from './sheets/arrival.js';
 import { openDeparture } from './sheets/departure.js';
 import { shareTrip, openSharedPreview } from './sheets/shareTrip.js';
@@ -25,7 +25,8 @@ import { shareTrip, openSharedPreview } from './sheets/shareTrip.js';
 Object.assign(window, {
   closeOv, undoLast,
   goHome, openTrip2, goRem, setRemTab, dismissIdeasHint, setTab, setIdeas, goView, addDay, delDay,
-  openAdd, openRem, newTrip, generateTrip, retryPending, openArrival, openDeparture, shareTrip,
+  openSettings, openSettingsSub, settingsBack, saveSettingsSub,
+  openAdd, openRem, newTrip, generateTrip, retryPending, openRegenerate, regenerateTrip, openArrival, openDeparture, shareTrip,
 });
 
 async function boot() {
