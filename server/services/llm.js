@@ -126,9 +126,11 @@ async function normalizePlace(p, bucket, order, city, cache = true) {
     sect: p.sect || undefined,
     bought: false, skipTk: false, userNote: '', done: false, order,
   };
-  // Кэшируем факты о месте (без пользовательских полей).
+  // Кэшируем факты о месте (без пользовательских полей). Fire-and-forget:
+  // запись в кэш не должна ни задерживать ответ (в проде это N round-trip'ов в PG),
+  // ни ронять генерацию — setPlace глотает ошибки внутри.
   if (cache) {
-    await setPlace(city, name, {
+    setPlace(city, name, {
       rating: place.rating, cat: place.cat, rname, wiki: place.wiki,
       desc: place.desc, visit: place.visit, ticket: place.ticket,
       warnH: place.warnH, warnS: place.warnS,

@@ -19,11 +19,14 @@ export async function getCityProfile(city, maxAgeMs) {
 }
 
 export async function setCityProfile(city, profile) {
-  await ds.run(
-    `INSERT INTO city_profile (city_key, profile, updated_at) VALUES (?, ?, ?)
-     ON CONFLICT(city_key) DO UPDATE SET profile = excluded.profile, updated_at = excluded.updated_at`,
-    [keyOf(city), JSON.stringify(profile), Date.now()],
-  );
+  // Кэш — оптимизация: ошибка записи не должна ронять генерацию маршрута.
+  try {
+    await ds.run(
+      `INSERT INTO city_profile (city_key, profile, updated_at) VALUES (?, ?, ?)
+       ON CONFLICT(city_key) DO UPDATE SET profile = excluded.profile, updated_at = excluded.updated_at`,
+      [keyOf(city), JSON.stringify(profile), Date.now()],
+    );
+  } catch (e) { console.warn('setCityProfile failed (ignored):', e.message); }
 }
 
 /** Факты о месте (слой A) или null. */
@@ -35,11 +38,14 @@ export async function getPlace(city, name, maxAgeMs) {
 }
 
 export async function setPlace(city, name, data) {
-  await ds.run(
-    `INSERT INTO place (place_key, city_key, name, data, updated_at) VALUES (?, ?, ?, ?, ?)
-     ON CONFLICT(place_key) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`,
-    [keyOf(city) + '::' + keyOf(name), keyOf(city), String(name || ''), JSON.stringify(data), Date.now()],
-  );
+  // Кэш — оптимизация: ошибка записи не должна ронять генерацию маршрута.
+  try {
+    await ds.run(
+      `INSERT INTO place (place_key, city_key, name, data, updated_at) VALUES (?, ?, ?, ?, ?)
+       ON CONFLICT(place_key) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`,
+      [keyOf(city) + '::' + keyOf(name), keyOf(city), String(name || ''), JSON.stringify(data), Date.now()],
+    );
+  } catch (e) { console.warn('setPlace failed (ignored):', e.message); }
 }
 
 /** Картинка города (URL) из кэша. undefined = не кэшировано; '' = кэшировано без картинки. */
