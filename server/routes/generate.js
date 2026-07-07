@@ -52,11 +52,15 @@ router.post('/generate', initDataAuth, async (req, res) => {
     fixedEvents: Array.isArray(b.fixedEvents) ? b.fixedEvents : [],
   };
 
+  const t0 = Date.now();
   try {
     const out = await generateTrip(input);
+    const ms = Date.now() - t0;
+    const placeN = (out.city && out.city.places && out.city.places.length) || 0;
+    console.log(`generate ok: "${city}" days=${input.days} places=${placeN} took=${ms}ms mock=${!!out.mock}`);
     res.json(out);
   } catch (e) {
-    console.error('generate failed:', e.message);
+    console.error(`generate failed: "${city}" took=${Date.now() - t0}ms — ${e.message}`);
     res.status(502).json({ error: 'generation failed', detail: e.message });
   }
 });
