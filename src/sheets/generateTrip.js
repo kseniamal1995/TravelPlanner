@@ -127,7 +127,8 @@ export async function runGenerate(input, replaceId = null) {
   store.animPending = true;
   render();
   try {
-    const { city, mock } = await api.generate(input);
+    const { jobId } = await api.generateStart(input);
+    const { city, mock } = await pollGeneration(jobId);
     store.pendingTrip = null;
     // Далёкие импортированные места → в «Идеи → На потом» готовой поездки.
     if (input._farIdeas && input._farIdeas.length) {
@@ -157,6 +158,30 @@ export async function runGenerate(input, replaceId = null) {
     render();
     console.warn('Генерация не удалась:', e.message);
   }
+}
+
+/** Опрос фоновой генерации короткими запросами: устойчиво к обрывам мобильной
+ *  сети/WebView (в отличие от одного длинного запроса). Возвращает { city, mock }. */
+async function pollGeneration(jobId) {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const DEADLINE = Date.now() + 1000 * 60 * 4; // ждём результат максимум 4 минуты
+  let misses = 0;
+  while (Date.now() < DEADLINE) {
+    await sleep(2500);
+    let s;
+    try {
+      s = await api.generateStatus(jobId);
+    } catch (e) {
+      // временный сбой сети/опроса — терпим несколько подряд, потом сдаёмся
+      if (++misses > 8) throw e;
+      continue;
+    }
+    misses = 0;
+    if (s.status === 'done') return { city: s.city, mock: s.mock };
+    if (s.status === 'error') throw new Error(s.detail || 'generation failed');
+    // status === 'running' → продолжаем опрос
+  }
+  throw new Error('Генерация заняла слишком долго');
 }
 
 /** Повторить последнюю упавшую генерацию (кнопка на плашке-заглушке). */

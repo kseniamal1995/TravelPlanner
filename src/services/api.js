@@ -30,8 +30,10 @@ export const api = {
     if (!r.ok) throw new Error('PUT /state → ' + r.status);
   },
 
-  /** Сгенерировать маршрут (слой C). input — данные онбординга. Возвращает { city, mock? }. */
-  async generate(input) {
+  /** Запустить фоновую генерацию маршрута. Возвращает { jobId }.
+   *  Генерация идёт на сервере ~30–70с; держать один длинный запрос нельзя
+   *  (мобильный WebView рвёт соединение) — поэтому старт + опрос статуса. */
+  async generateStart(input) {
     const r = await fetch(`${BASE}/generate`, {
       method: 'POST',
       headers: headers(),
@@ -40,8 +42,15 @@ export const api = {
     if (!r.ok) {
       let detail = '';
       try { detail = (await r.json()).detail || ''; } catch { /* ignore */ }
-      throw new Error('Генерация не удалась (' + r.status + ')' + (detail ? ': ' + detail : ''));
+      throw new Error('Не удалось запустить генерацию (' + r.status + ')' + (detail ? ': ' + detail : ''));
     }
+    return r.json();
+  },
+
+  /** Опросить статус фоновой генерации. Возвращает { status, city?, mock?, detail? }. */
+  async generateStatus(jobId) {
+    const r = await fetch(`${BASE}/generate/status?jobId=` + encodeURIComponent(jobId), { headers: headers() });
+    if (!r.ok) throw new Error('status ' + r.status);
     return r.json();
   },
 
